@@ -1,0 +1,16 @@
+version: '3'
+services:
+  mongo:
+    image: 'mongo'
+    ports: 
+      - '27017:27017'
+  grabber:
+    build:
+      context: .
+      dockerfile: grabber.Dockerfile
+  app:
+    build:
+      context: .
+      dockerfile: app.Dockerfile
+    ports:
+      - '3000:3000'
