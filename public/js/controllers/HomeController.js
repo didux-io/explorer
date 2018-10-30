@@ -51,7 +51,7 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
       var ethPriceURL = "https://coinmarketcap-nexuist.rhcloud.com/api/eth"
       scope.stats.ethDiff = 1;
       scope.stats.ethHashrate = 1;
-      scope.stats.usdEth = 1;
+      scope.stats.usdEth = 0.25;
 
 
       

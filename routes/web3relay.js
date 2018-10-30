@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+var fs = require("fs");
 
 /*
     Endpoint for client to talk to etc node
@@ -14,11 +15,12 @@ var getLatestBlocks = require('./index').getLatestBlocks;
 var filterBlocks = require('./filters').filterBlocks;
 var filterTrace = require('./filters').filterTrace;
 
+var config = JSON.parse(fs.readFileSync("./config.json"));
 
 if (typeof web3 !== "undefined") {
   web3 = new Web3(web3.currentProvider);
 } else {
-  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+  web3 = new Web3(new Web3.providers.HttpProvider("http://" + config.gethAddress + ":" + config.gethPort));
 }
 
 if (web3.isConnected()) 

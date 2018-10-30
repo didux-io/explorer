@@ -31,6 +31,7 @@ Configuration file: `/tools/config.json`
 Basic settings:
 ```json
 {
+    "gethAddress": "localhost",
     "gethPort": 8545, 
     "blocks": [ {"start": 2000000, "end": "latest"}],
     "quiet": false,

@@ -189,95 +189,95 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvide
                 }]
             }
         })
-        .state('stats', {
-            url: "/stats/{chart}",
-            templateUrl: "views/stats/index.html",
-            data: {pageTitle: 'Transaction'},
-            controller: "StatsController",
-            resolve: {
-                deps: ['$ocLazyLoad', '$stateParams', function($ocLazyLoad, $stateParams) {
-                    var bundle = '/js/stats/bundle_';
+        // .state('stats', {
+        //     url: "/stats/{chart}",
+        //     templateUrl: "views/stats/index.html",
+        //     data: {pageTitle: 'Transaction'},
+        //     controller: "StatsController",
+        //     resolve: {
+        //         deps: ['$ocLazyLoad', '$stateParams', function($ocLazyLoad, $stateParams) {
+        //             var bundle = '/js/stats/bundle_';
 
-                    switch ($stateParams.chart) {
-                        case "etc_hashrate":
-                            bundle = bundle + "hashrate.js";
-                            break;
-                        case "miner_hashrate":
-                            bundle = bundle + "hashrate_distribution.js";
-                            break;
+        //             switch ($stateParams.chart) {
+        //                 case "etc_hashrate":
+        //                     bundle = bundle + "hashrate.js";
+        //                     break;
+        //                 case "miner_hashrate":
+        //                     bundle = bundle + "hashrate_distribution.js";
+        //                     break;
 
-                        case "The_bomb_chart":
-                            bundle = bundle + "The_bomb_chart_with_ECIP_1010.js";
-                            break;
+        //                 case "The_bomb_chart":
+        //                     bundle = bundle + "The_bomb_chart_with_ECIP_1010.js";
+        //                     break;
 
-                    }
+        //             }
 
-                    return $ocLazyLoad.load({
-                        insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
-                        files: [
-                             '/js/controllers/StatsController.js',
-                             '/css/stats.css',
-                             "https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.10/d3.js",
-                             "/plugins/async.min.js",
-                             bundle
-                        ]
-                    });
-                }]
-            }
-        })
-        .state('tokenlist', {
-            url: "/token",
-            templateUrl: "views/tokenlist.html",
-            data: {pageTitle: 'Tokens'},
-            controller: "TokenListController",
-            resolve: {
-                deps: ['$ocLazyLoad', function($ocLazyLoad) {
-                    return $ocLazyLoad.load({
-                        name: 'BlocksApp',
-                        insertBefore: '#ng_load_plugins_before', 
-                        files: [
-                             '/js/controllers/TokenListController.js'
-                        ]
-                    });
-                }]
-            }
-        })
+        //             return $ocLazyLoad.load({
+        //                 insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
+        //                 files: [
+        //                      '/js/controllers/StatsController.js',
+        //                      '/css/stats.css',
+        //                      "https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.10/d3.js",
+        //                      "/plugins/async.min.js",
+        //                      bundle
+        //                 ]
+        //             });
+        //         }]
+        //     }
+        // })
+        // .state('tokenlist', {
+        //     url: "/token",
+        //     templateUrl: "views/tokenlist.html",
+        //     data: {pageTitle: 'Tokens'},
+        //     controller: "TokenListController",
+        //     resolve: {
+        //         deps: ['$ocLazyLoad', function($ocLazyLoad) {
+        //             return $ocLazyLoad.load({
+        //                 name: 'BlocksApp',
+        //                 insertBefore: '#ng_load_plugins_before', 
+        //                 files: [
+        //                      '/js/controllers/TokenListController.js'
+        //                 ]
+        //             });
+        //         }]
+        //     }
+        // })
 
-        .state('token', {
-            url: "/token/{hash}",
-            templateUrl: "views/token.html",
-            data: {pageTitle: 'Tokens'},
-            controller: "TokenController",
-            resolve: {
-                deps: ['$ocLazyLoad', function($ocLazyLoad) {
-                    return $ocLazyLoad.load({
-                        name: 'BlocksApp',
-                        insertBefore: '#ng_load_plugins_before', 
-                        files: [
-                             '/js/controllers/TokenController.js'
-                        ]
-                    });
-                }]
-            }
-        })
+        // .state('token', {
+        //     url: "/token/{hash}",
+        //     templateUrl: "views/token.html",
+        //     data: {pageTitle: 'Tokens'},
+        //     controller: "TokenController",
+        //     resolve: {
+        //         deps: ['$ocLazyLoad', function($ocLazyLoad) {
+        //             return $ocLazyLoad.load({
+        //                 name: 'BlocksApp',
+        //                 insertBefore: '#ng_load_plugins_before', 
+        //                 files: [
+        //                      '/js/controllers/TokenController.js'
+        //                 ]
+        //             });
+        //         }]
+        //     }
+        // })
 
-        .state('dao', {
-            url: "/dao",
-            templateUrl: "views/dao.html",
-            data: {pageTitle: 'theDAO'},
-            controller: "DAOController",
-            resolve: {
-                deps: ['$ocLazyLoad', function($ocLazyLoad) {
-                    return $ocLazyLoad.load({
-                        name: 'BlocksApp',
-                        insertBefore: '#ng_load_plugins_before', 
-                        files: [
-                             '/js/controllers/DAOController.js'
-                        ]
-                    });
-                }]
-            }
-        })
+        // .state('dao', {
+        //     url: "/dao",
+        //     templateUrl: "views/dao.html",
+        //     data: {pageTitle: 'theDAO'},
+        //     controller: "DAOController",
+        //     resolve: {
+        //         deps: ['$ocLazyLoad', function($ocLazyLoad) {
+        //             return $ocLazyLoad.load({
+        //                 name: 'BlocksApp',
+        //                 insertBefore: '#ng_load_plugins_before', 
+        //                 files: [
+        //                      '/js/controllers/DAOController.js'
+        //                 ]
+        //             });
+        //         }]
+        //     }
+        // })
 
         .state('err404', {
             url: "/err404/{thing}/{hash}",

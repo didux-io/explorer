@@ -1,7 +1,8 @@
 div.page-logo {overflow: visible;}
 img.logo-default {
     max-height: 150px;
-    height: 100px;
+    height: 80px;
+    margin-top: 15px;
 }
 .create{background-color:#36c6d3}
 .truncate-txhash, .truncate-addrhash{
@@ -129,4 +130,12 @@ li.ng-scope {
 }
 ::-webkit-scrollbar-track {
     background-color: transparent;
+}
+
+.medium {
+    background: url(../img/social/medium.png) no-repeat;
+}
+
+.color-smilo {
+    color: #032b3f;
 }

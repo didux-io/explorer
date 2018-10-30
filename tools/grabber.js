@@ -11,7 +11,7 @@ var Block     = mongoose.model( 'Block' );
 var Transaction     = mongoose.model( 'Transaction' );
 
 var grabBlocks = function(config) {
-    var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:' + 
+    var web3 = new Web3(new Web3.providers.HttpProvider('http://' + config.gethAddress.toString() + ':' + 
         config.gethPort.toString()));
 
 
@@ -255,6 +255,11 @@ catch (error) {
         throw error;
         process.exit(1);
     }
+}
+
+// set the default geth address if it's not provided
+if (!('gethAddress' in config) || (typeof config.gethAddress) !== 'string') {
+    config.gethAddress = "localhost"; // default
 }
 
 // set the default geth port if it's not provided
