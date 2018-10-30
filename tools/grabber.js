@@ -283,3 +283,7 @@ console.log(config);
 
 grabBlocks(config);
 // patchBlocks(config);
+
+process.on('SIGINT', function() {
+    process.exit();
+});

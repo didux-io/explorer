@@ -71,3 +71,7 @@ var http = require('http').Server(app);
 http.listen(app.get('port'), '0.0.0.0', function() {
     console.log('Express server listening on port ' + app.get('port'));
 });
+
+process.on('SIGINT', function() {
+    process.exit();
+});
