@@ -139,3 +139,11 @@ li.ng-scope {
 .color-smilo {
     color: #032b3f;
 }
+
+.page-prefooter h2 {
+    color: white !important;
+}
+
+.navbar-nav > li.active > a {
+    border-bottom: 4px solid #032b3f !important;
+}
