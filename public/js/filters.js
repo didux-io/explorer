@@ -30,6 +30,9 @@ var getDifficulty = function(hashes) {
     result = hashes / Math.pow(1000, 4);
     unit = 'T';
   }
+  
+  result = Number(result);
+
   return result.toFixed(2) + ' ' + unit + 'H';
 }
 
