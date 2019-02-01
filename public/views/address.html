@@ -8,17 +8,13 @@
         <div class="row">
             <div class="col-md-6 center">
               <div >
-                <span class="eth-stat-title">
-                  {{ addr.balance | number: 10 }} </span><br>
-                <span class="eth-stat-text">
+                  <span class="eth-stat-text">
                   Smilo balance
-                </span><br> 
+                </span><br>
+                  <span class="eth-stat-title">
+                  {{ addr.balance | number: 10 }} XSM</span><br>
                   <div class="margin-top-20">
-                  <!-- <span class="fade">{{ addr.ethfiat | number: 10 }}</span> <span class="eth-stat-text fade">Smilo balance
-                  </span> <a href="http://etherscan.io/address/{{addrHash}}" target="_blank"><i class="fa fa-external-link"></i></a> -->
-                  </div>
-                  <div class="margin-top-20">
-                  0 <span class="eth-stat-text">Mined</span>
+                  <!-- Todo Add token selector-->
                   </div>
                   <div class="margin-top-20">
                   {{ addr.count }} <span class="eth-stat-text">Transactions</span>

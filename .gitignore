@@ -42,3 +42,4 @@ data/
 .DS_Store
 .node*
 /config.json
+.idea

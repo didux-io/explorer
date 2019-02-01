@@ -64,10 +64,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           {"type": "date", "targets": 6},
           {"orderable": false, "targets": [0,2,3]},
           { "render": function(data, type, row) {
-                        if (data != $scope.addrHash)
                           return '<a href="/addr/'+data+'">'+data+'</a>'
-                        else
-                          return data
                       }, "targets": [2,3]},
           { "render": function(data, type, row) {
                         return '<a href="/block/'+data+'">'+data+'</a>'
@@ -78,6 +75,9 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           { "render": function(data, type, row) {
                         return getDuration(data).toString();
                       }, "targets": [6]},
+          { "render": function(data, type, row) {
+                    return data+' XSM'.toString();
+                }, "targets": [4]},
           ]
       });
     }
