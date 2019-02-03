@@ -146,7 +146,7 @@ var latestBlock = function(req, res) {
 
 
 var getLatest = function(lim, res, callback) {
-  var blockFind = Block.find({}, "number transactions timestamp miner extraData")
+  var blockFind = Block.find({}, "number txCount timestamp extraData")
                       .lean(true).sort('-number').limit(lim);
   blockFind.exec(function (err, docs) {
     callback(docs, res);
@@ -155,9 +155,10 @@ var getLatest = function(lim, res, callback) {
 
 /* get blocks from db */
 var sendBlocks = function(lim, res) {
-  var blockFind = Block.find({}, "number transactions timestamp miner extraData")
+  var blockFind = Block.find({}, "number txCount size timestamp extraData")
                       .lean(true).sort('-number').limit(lim);
   blockFind.exec(function (err, docs) {
+      console.log(docs);
     res.write(JSON.stringify({"blocks": filters.filterBlocks(docs)}));
     res.end();
   });

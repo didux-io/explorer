@@ -119,7 +119,10 @@ var grabBlock = function(config, web3, blockHashOrNumber) {
 
 
 var writeBlockToDB = function(config, blockData) {
-    return new Block(blockData).save( function( err, block, count ){
+    block = new Block(blockData);
+    block.txCount = blockData.transactions.length;
+
+    return block.save( function( err, block, count ){
         if ( typeof err !== 'undefined' && err ) {
             if (err.code == 11000) {
                 console.log('Skip: Duplicate key ' + 
