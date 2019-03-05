@@ -11,7 +11,7 @@ var Block     = mongoose.model( 'Block' );
 var Transaction     = mongoose.model( 'Transaction' );
 
 var grabBlocks = function(config) {
-    var web3 = new Web3(new Web3.providers.HttpProvider('http://' + config.gethAddress.toString() + ':' + 
+    var web3 = new Web3(new Web3.providers.HttpProvider('https://' + config.gethAddress.toString() + ':' +
         config.gethPort.toString()));
 
 
@@ -32,6 +32,7 @@ var listenBlocks = function(config, web3) {
             console.log('Error: ' + error);
         } else if (log == null) {
             console.log('Warning: null block hash');
+            process.exit(9);
         } else {
             grabBlock(config, web3, log);
         }
@@ -52,7 +53,7 @@ var grabBlock = function(config, web3, blockHashOrNumber) {
             desiredBlockHashOrNumber = blockHashOrNumber.end;
         }
         else {
-            console.log('Error: Aborted becasue found a interval in blocks ' +
+            console.log('Error: Aborted because found a interval in blocks ' +
                 'array that doesn\'t have both a start and end.');
             process.exit(9);
         }
@@ -119,10 +120,7 @@ var grabBlock = function(config, web3, blockHashOrNumber) {
 
 
 var writeBlockToDB = function(config, blockData) {
-    block = new Block(blockData);
-    block.txCount = blockData.transactions.length;
-
-    return block.save( function( err, block, count ){
+    return new Block(blockData).save( function( err, block, count ){
         if ( typeof err !== 'undefined' && err ) {
             if (err.code == 11000) {
                 console.log('Skip: Duplicate key ' + 
