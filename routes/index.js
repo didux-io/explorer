@@ -172,7 +172,7 @@ var sendTxs = function(lim, res) {
         });
 }
 
-const MAX_ENTRIES = 100;
+const MAX_ENTRIES = 20;
 
 const DATA_ACTIONS = {
   "latest_blocks": sendBlocks,
