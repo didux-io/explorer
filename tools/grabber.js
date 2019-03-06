@@ -120,6 +120,11 @@ var grabBlock = function(config, web3, blockHashOrNumber) {
 
 
 var writeBlockToDB = function(config, blockData) {
+    // block = new Block(blockData);
+    blockData.txCount = blockData.transactions.length;
+    if (blockData.txCount == null) {
+        blockData.txCount = 0;
+    }
     return new Block(blockData).save( function( err, block, count ){
         if ( typeof err !== 'undefined' && err ) {
             if (err.code == 11000) {

@@ -55,7 +55,7 @@ function filterBlock(block, field, value) {
 function filterBlocks(blocks) {
   if (blocks.constructor !== Array) {
     var b = blocks;
-    b.extraData = hex2ascii(blocks.extraData);
+      b.extraData = hex2ascii(blocks.extraData);
     return b;
   }
   return blocks.map(function(block) {
