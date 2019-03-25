@@ -99,7 +99,6 @@ exports.data = function(req, res){
 
   } else if ("tx_trace" in req.body) {
     var txHash = req.body.tx_trace.toLowerCase();
-
     web3.trace.transaction(txHash, function(err, tx) {
       if(err || !tx) {
         console.error("TraceWeb3 error :" + err)

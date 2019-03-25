@@ -3,6 +3,7 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
         // initialize core components
         App.initAjax();
     });
+    $rootScope.showHeaderPageTitle = true;
     var activeTab = $location.url().split('#');
     if (activeTab.length > 1)
       $scope.activeTab = activeTab[1];
@@ -18,7 +19,6 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
       url: '/tokenrelay',
       data: {"action": "info", "address": address}
     }).success(function(data) {
-      console.log(data)
       $scope.token = data;
       $scope.token.address = address;
       $scope.addr = {"bytecode": data.bytecode};
@@ -43,7 +43,6 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
             url: '/tokenrelay',
             data: {"action": "balanceOf", "user": addr, "address": address}
           }).success(function(data) {
-            console.log(data)
             $scope.showTokens = true;
             $scope.userTokens = data.tokens;
           });

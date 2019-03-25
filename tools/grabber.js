@@ -9,6 +9,7 @@ var Web3 = require('web3');
 var mongoose = require( 'mongoose' );
 var Block     = mongoose.model( 'Block' );
 var Transaction     = mongoose.model( 'Transaction' );
+var MinedBlocksCount     = mongoose.model( 'MinedBlocksCount' );
 
 var grabBlocks = function(config) {
     var web3 = new Web3(new Web3.providers.HttpProvider('https://' + config.gethAddress.toString() + ':' +
@@ -121,6 +122,7 @@ var grabBlock = function(config, web3, blockHashOrNumber) {
 
 var writeBlockToDB = function(config, blockData) {
     // block = new Block(blockData);
+    blockData.blockReward = getBlockReward(blockData.number);
     blockData.txCount = blockData.transactions.length;
     if (blockData.txCount == null) {
         blockData.txCount = 0;
@@ -143,7 +145,60 @@ var writeBlockToDB = function(config, blockData) {
                     blockData.number.toString() );
             }            
         }
+        MinedBlocksCount.findOneAndUpdate(
+            {   // Filter
+                address: blockData.miner
+            }, 
+            {   // Update
+                $inc: {
+                    amount: 1
+                },
+                type: "address"
+            },
+            {   // Options
+                upsert: true,
+                new: true
+            },  
+            (   // Callback
+                err, 
+                tx
+            ) => { // Return
+                console.log("UPPING ONE TRANSACTION");
+            }
+        );
       });
+}
+
+let getBlockReward = function(b) {
+    if (b > 0 && b < 20000001) {
+        return 4;
+    } else if (b > 20000000 && b < 40000001) {
+        return 2;
+    } else if (b > 40000000 && b < 60000001) {
+        return 1.75;
+    } else if (b > 60000000 && b < 80000001) {
+        return 1.5;
+    } else if (b > 80000000 && b < 100000001) {
+        return 1.25;
+    } else if (b > 100000000 && b < 120000001) {
+        return 1.0;
+    } else if (b > 120000000 && b < 140000001) {
+        return 0.8;
+    } else if (b > 140000000 && b < 160000001) {
+        return 0.6;
+    } else if (b > 160000000 && b < 180000001) {
+        return 0.4;
+    } else if (b > 180000000 && b < 200000001) {
+        return 0.2;
+    } else if (b > 200000000 && b < 400000001) {
+        return 0.1;
+    } else if (b > 400000000 && b < 800000001) {
+        return 0.05;
+    } else if (b > 800000000 && b < 1600000001) {
+        return 0.025;
+    } else if (b > 1600000000 && b < 3200000001) {
+        return 0.0125;
+    } 
 }
 
 /**
@@ -193,6 +248,27 @@ var writeTransactionsToDB = function(config, blockData) {
                 
             }
         });
+        console.log('SHOULD UP TRANSACTION COUNT!');
+        MinedBlocksCount.findOneAndUpdate(
+            {   // Filter
+                type: "global"
+            }, 
+            {   // Update
+                $inc: {
+                    amount: 1
+                }
+            },
+            {   // Options
+                upsert: true,
+                new: true
+            },  
+            (   // Callback
+                err, 
+                tx
+            ) => { // Return
+                console.log("UPPING ONE TRANSACTION");
+            }
+        );
     }
 }
 

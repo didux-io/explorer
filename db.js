@@ -21,7 +21,8 @@ var Block = new Schema(
     "gasUsed": Number,
     "timestamp": Number,
     "uncles": [String],
-    "txCount": Number
+    "txCount": Number,
+    "blockReward": Number
 });
 
 var Contract = new Schema(
@@ -52,12 +53,20 @@ var Transaction = new Schema(
     "input": String
 });
 
+var MinedBlocksCount = new Schema(
+{
+    "type": String,
+    "amount": Number,
+    "address": {type: String, index: {unique: true}}
+});
+
 mongoose.model('Block', Block);
 mongoose.model('Contract', Contract);
 mongoose.model('Transaction', Transaction);
+mongoose.model('MinedBlocksCount', MinedBlocksCount);
 module.exports.Block = mongoose.model('Block');
 module.exports.Contract = mongoose.model('Contract');
-module.exports.Transaction = mongoose.model('Transaction');
+module.exports.MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
 setTimeout(() => {
     mongoose.connect( 'mongodb://mongo/blockDB' );

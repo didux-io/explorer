@@ -35,11 +35,22 @@ img.logo-default {
     font-size: 25px;
     text-align: center;
 }
+
 .eth-stat-text {
     color: #5b9bd1;
     font-size: 13px;
     font-weight: 800;
     text-align: center;
+}
+th {
+    padding: 10px 10px !important;
+}
+.margin-left-16 {
+    margin-left: 16px;
+}
+.addr-stats {
+    display: flex;
+    flex-direction: row;
 }
 .fade {opacity: 0.6}
 .portlet {
@@ -150,4 +161,38 @@ li.ng-scope {
 
 .navbar-nav > li.active > a {
     border-bottom: 4px solid #032b3f !important;
+}
+
+@media (max-width: 992px) {
+    .logo-default {
+        height: 60px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .top-menu {
+        width: 100%;
+    }
+
+    .dropdown {
+        margin-top: 20px !important;
+    }
+
+    .nav {
+        width: 100%;
+    }
+
+    .dropdown {
+        width: 100%;
+    }
+
+    .search-form {
+        width: 100%;
+    }
+}
+
+@media (max-width: 475px) {
+    .dropdown {
+        margin-top: 0px !important;
+    }
 }

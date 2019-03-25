@@ -5,6 +5,8 @@ angular.module('BlocksApp').controller('BlockController', function($stateParams,
         //TableAjax.init();
     });
 
+    $rootScope.showHeaderPageTitle = true;
+
     $rootScope.$state.current.data["pageSubTitle"] = $stateParams.number;
     $scope.blockNum = $stateParams.number;
 

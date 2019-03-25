@@ -2,7 +2,11 @@ var mongoose = require( 'mongoose' );
 
 var Block     = mongoose.model( 'Block' );
 var Transaction = mongoose.model( 'Transaction' );
-var filters = require('./filters')
+var filters = require('./filters');
+
+// let mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
+let MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
 
 var async = require('async');
@@ -27,6 +31,8 @@ module.exports = function(app){
   app.post('/tx', getTx);
   app.post('/block', getBlock);
   app.post('/data', getData);
+  app.get('/minedblockcount', getMinedBlockCount);
+  app.post('/minedblocks', getMinedBlocks);
 
   app.post('/daorelay', DAO);
   app.post('/tokenrelay', Token);  
@@ -43,6 +49,8 @@ var getAddr = function(req, res){
   // TODO: validate addr and tx
   var addr = req.body.addr.toLowerCase();
   var count = parseInt(req.body.count);
+
+  
 
   var limit = parseInt(req.body.length);
   var start = parseInt(req.body.start);
@@ -61,8 +69,40 @@ var getAddr = function(req, res){
             res.end();
           });
 };
- 
 
+var getMinedBlockCount = async function(req, res) {
+  let addr = req.query.addr;
+  let minedBlockCount = 0;
+  let minedBlockObj = (await MinedBlocksCount.findOne({address: addr}));
+  if (minedBlockObj) {
+    minedBlockCount = minedBlockObj.amount;
+  }
+  res.write(JSON.stringify(minedBlockCount));
+  res.end();
+};
+ 
+var getMinedBlocks = async function(req, res) {
+  let addr = req.body.addr;
+  var count = parseInt(req.body.count);
+
+  var data = { draw: parseInt(req.body.draw), recordsFiltered: count, recordsTotal: count };
+
+  let minedBlocks = Block.find({miner: addr});
+
+  var limit = parseInt(req.body.length);
+  var start = parseInt(req.body.start);
+
+  minedBlocks.lean(true).skip(start).limit(limit)
+            .exec("find", function (err, docs) {
+              // console.log('Docs:', docs);
+              if (docs)
+                data.data = filters.filterMinedBlock(docs, addr);      
+              else 
+                data.data = [];
+              res.write(JSON.stringify(data));
+              res.end();
+            });
+};
 
 var getBlock = function(req, res) {
 
@@ -93,7 +133,6 @@ var getTx = function(req, res){
                   .lean(true);
   txFind.exec(function (err, doc) {
     if (!doc){
-      console.log("missing: " +tx)
       res.write(JSON.stringify({}));
       res.end();
     } else {
@@ -158,7 +197,6 @@ var sendBlocks = function(lim, res) {
   var blockFind = Block.find({}, "number miner txCount size timestamp extraData")
                       .lean(true).sort('-number').limit(lim);
   blockFind.exec(function (err, docs) {
-      console.log(docs);
     res.write(JSON.stringify({"blocks": filters.filterBlocks(docs)}));
     res.end();
   });

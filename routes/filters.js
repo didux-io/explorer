@@ -13,6 +13,15 @@ function filterTX(txs, value) {
   })
 }
 
+function filterMinedBlock(mbs, value) {
+  return mbs.map(function(mb){
+    // return [tx.hash, tx.blockNumber, tx.from, tx.to,
+    //         etherUnits.toEther(new BigNumber(tx.value), 'wei'), tx.gas, tx.timestamp]
+    // Todo: Better fix for src20 contracts!
+      return [mb.number, mb.blockReward, mb.gasUsed, mb.gasLimit, mb.txCount, mb.timestamp]
+  })
+}
+
 function filterTrace(txs, value) {
   return txs.map(function(tx){
     var t = tx;
@@ -95,6 +104,7 @@ module.exports = {
   filterBlock: filterBlock,
   filterBlocks: filterBlocks,
   filterTX: filterTX,
+  filterMinedBlock: filterMinedBlock,
   filterTrace: filterTrace,
   datatableTX: datatableTX,
   internalTX: internalTX

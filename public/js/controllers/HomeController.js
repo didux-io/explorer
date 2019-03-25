@@ -6,7 +6,7 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
 
     var URL = '/data';
 
-    $rootScope.isHome = true;
+    $rootScope.showHeaderPageTitle = false;
 
     $scope.reloadBlocks = function() {
       $scope.blockLoading = true;

@@ -15,7 +15,6 @@ const Contract = eth.contract(ABI);
 
 
 module.exports = function(req, res){
-  console.log(req.body)
 
   var contractAddress = req.body.address;
 
