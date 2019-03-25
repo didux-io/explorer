@@ -66,6 +66,7 @@ mongoose.model('Transaction', Transaction);
 mongoose.model('MinedBlocksCount', MinedBlocksCount);
 module.exports.Block = mongoose.model('Block');
 module.exports.Contract = mongoose.model('Contract');
+module.exports.Transaction = mongoose.model('Transaction');
 module.exports.MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
 setTimeout(() => {
