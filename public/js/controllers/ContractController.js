@@ -56,7 +56,6 @@ angular.module('BlocksApp').controller('ContractController', function($statePara
           data: contractReq
         }).then(function(resp) {
           $("#submitCodeBtn").button("reset");
-          console.log(resp.data);
           $scope.contract = resp.data;
           $scope.contract.compiled = true;
         });

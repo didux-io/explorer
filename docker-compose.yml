@@ -26,14 +26,6 @@ services:
       MONGO_URI: 'mongodb://db/explorerDB'
     depends_on:
       - db
-  price:
-    build: .
-    command: ./tools/price.js
-    restart: always
-    environment:
-      MONGO_URI: 'mongodb://db/explorerDB'
-    depends_on:
-      - db
   richlist:
     build: .
     command: ./tools/richlist.js
@@ -44,3 +36,5 @@ services:
       - db
   db:
     image: mongo
+    ports: 
+      - '27017:27017'

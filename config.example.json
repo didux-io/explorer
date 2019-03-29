@@ -1,6 +1,6 @@
 {
-    "nodeAddr":     "localhost",
-    "wsPort":       8546,
+    "nodeAddr":     "99.80.85.184",
+    "wsPort":       23000,
     "startBlock":   0,
     "endBlock":     "latest",
     "quiet":        true,
@@ -9,25 +9,25 @@
     "patchBlocks":  100,
     "bulkSize":     100,
     "settings": {
-        "symbol": "ETC",
-        "name": "Ethereum Classic",
-        "title": "Ethereum Classic Block Explorer",
+        "symbol": "XSM",
+        "name": "Smilo Platform",
+        "title": "Smilo Platform Block Explorer",
         "author": "Elaine, Cody, Hackmod, Bakon",
-        "contact": "mailto:ethereumclassicanthony@gmail.com",
-        "about": "This is an open source Blockchain Explorer.",
-        "rss": "https://ethereumclassic.org",
-        "reddit": "https://www.reddit.com/r/EthereumClassic",
-        "twitter": "https://twitter.com/eth_classic",
-        "linkedin": "https://www.linkedin.com/company/ethereum-classic",
-        "github": "https://github.com/ethereumclassic",
-        "logo": "/img/explorer-logo.png",
-        "copyright": "2019 &copy; Ethereum Classic.",
+        "contact": "info@smilo.io",
+        "about": "This is the Smilo Blockchain Explorer.",
+        "rss": "https://smilo.io",
+        "reddit": "https://www.reddit.com/r/SmiloPlatform/",
+        "twitter": "https://twitter.com/SmiloPlatform",
+        "linkedin": "https://www.linkedin.com/company/smilo-platform-bv/",
+        "github": "https://github.com/Smilo-platform/",
+        "logo": "/img/smilo-logo.png",
+        "copyright": "2019 &copy; Smilo Platform.",
         "poweredbyCustom": false,
         "poweredbyEtcImage": "/img/powered-by-etcexplorer-w.png",
-        "poweredbyEtc": true,
+        "poweredbyEtc": false,
         "tokenList": "tokens.json",
-        "useRichList": true,
-        "useFiat": true,
+        "useRichList": false,
+        "useFiat": false,
         "miners": {
             "0xdf7d7e053933b5cc24372f878c90e62dadad5d42": "EtherMine",
             "0xc91716199ccde49dc4fafaeb68925127ac80443f": "F2Pool",
@@ -52,6 +52,6 @@
             "0xeda79f0735a56510876a497e1c105916666b0199": "Comining",
             "0xd3bfd58a31ddeb2fdd2bc212e38c41725bc93ccd": "EtherDig HVPPS",
             "0xf35074bbd0a9aee46f4ea137971feec024ab704e": "solopool.org"
-         }
+        }
     }
 }

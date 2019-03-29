@@ -14,6 +14,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
 
       if (tabId === 4) {
         fetchMinedBlocks($scope.addr.minedBlockCount);
+        
       }
     }
 
@@ -28,38 +29,6 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
     $scope.addrHash = $stateParams.hash;
     $scope.addr = {"balance": 0, "count": 0, "mined": 0};
     $scope.settings = $rootScope.setup;
-
-    //fetch web3 stuff
-    $http({
-      method: 'POST',
-      url: '/web3relay',
-      data: {"addr": $scope.addrHash, "options": ["balance", "count", "bytecode"]}
-    }).then(function(resp) {
-      $scope.addr = $.extend($scope.addr, resp.data);
-      fetchTxs();
-      if (resp.data.isContract) {
-        $rootScope.$state.current.data["pageTitle"] = "Contract Address";
-        // fetchInternalTxs();
-      }
-      $http({
-        method: 'GET',
-        url: '/minedblockcount?addr=' + $scope.addrHash,
-      }).success(function(data) {
-        $scope.addr.minedBlockCount = data;
-        if ($scope.activeTab === "tab_addr_4") {
-          fetchMinedBlocks($scope.addr.minedBlockCount);
-        }
-      });
-    });
-
-    // fetch ethf balance 
-    $http({
-      method: 'POST',
-      url: '/fiat',
-      data: {"addr": $scope.addrHash}
-    }).success(function(data) {
-      $scope.addr.ethfiat = data.balance;
-    });
 
     var fetchMinedBlocks = function(count) {
       if (minedBlocksTableExists) {
@@ -102,11 +71,8 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
                         return data; // Gas Limit
                       }, "targets": [3]},
           { "render": function(data, type, row) {
-                        return data;  // Tx Count
-                      }, "targets": [4]},
-          { "render": function(data, type, row) {
                         return timeConverter(data); // Timestamp
-                      }, "targets": [5]},
+                      }, "targets": [4]},
           ]
       });
     }
@@ -211,6 +177,44 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
       });
     }
 
+    $http({
+      method: 'POST',
+      url: '/web3relay',
+      data: {"addr": $scope.addrHash, "options": ["balance", "count", "bytecode"]}
+    }).then(function(resp) {
+      $scope.addr = $.extend($scope.addr, resp.data);
+      fetchTxs();
+      if (resp.data.isContract) {
+        $rootScope.$state.current.data["pageTitle"] = "Contract Address";
+        // fetchInternalTxs();
+        $http({
+          method: 'GET',
+          url: '/contractdetails?addr=' + $scope.addrHash,
+        }).then(function(data) {
+          $scope.addr.owner = data.data.owner;
+          $scope.addr.creationTransaction = data.data.creationTransaction;
+        });
+      }
+      $http({
+        method: 'GET',
+        url: '/minedblockcount?addr=' + $scope.addrHash,
+      }).then(function(data) {
+        $scope.addr.minedBlockCount = data.data;
+        if ($scope.activeTab === "tab_addr_4") {
+          fetchMinedBlocks($scope.addr.minedBlockCount);
+        }
+      });
+    });
+
+    // fetch ethf balance 
+    if ($scope.settings.useEthFiat)
+    $http({
+      method: 'POST',
+      url: '/fiat',
+      data: {"addr": $scope.addrHash}
+    }).then(function(resp) {
+      $scope.addr.ethfiat = resp.data.balance;
+    });
 })
 .directive('contractSource', function($http) {
   return {
@@ -224,7 +228,6 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           url: '/compile',
           data: {"addr": scope.addrHash, "action": "find"}
         }).then(function(resp) {
-          console.log(resp.data);
           scope.contract = resp.data;
         });
       }

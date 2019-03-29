@@ -160,13 +160,13 @@ angular.module('BlocksApp').controller('StatsController', function($stateParams,
                         return arc(interpolate(t));
                     };
                 })
-            slice
-                .on("mousemove", function (d) {
-                    div.style("left", d3.event.pageX + 10 + "px");
-                    div.style("top", d3.event.pageY - 25 + "px");
-                    div.style("display", "inline-block");
-                    div.html((d.data._id) + "<br>" + (d.data.count) + "<br>(" + d3.format(".2%")(d.data.count / total) + ")");
-                });
+            // slice
+            //     .on("mousemove", function (d) {
+            //         div.style("left", d3.event.pageX + 10 + "px");
+            //         div.style("top", d3.event.pageY - 25 + "px");
+            //         div.style("display", "inline-block");
+            //         div.html((d.data._id) + "<br>" + (d.data.count) + "<br>(" + d3.format(".2%")(d.data.count / total) + ")");
+            //     });
             slice
                 .on("mouseout", function (d) {
                     div.style("display", "none");
@@ -423,43 +423,43 @@ angular.module('BlocksApp').controller('StatsController', function($stateParams,
 
             svg.call(tip);
 
-            svg.append("rect")
-                .attr("class", "overlay")
-                .attr("width", width)
-                .attr("height", height)
-                .on("mouseover", function() {
-                    var x0 = x.invert(d3.mouse(this)[0]);
-                    var s1 = _.minBy(data, function(d) {
-                        return Math.abs(moment(x0).unix()-d.unixtime);
-                    });
-                    tip.show(s1, this);
-                    tip.style("left", d3.event.pageX + 10 + "px");
-                    tip.style("top", d3.event.pageY + 25 + "px");
-                    focus.style("display", null);
-                 })
-                .on("mouseout", function() { tip.hide(); focus.style("display", "none"); })
-                .on("mousemove", mousemove);
+            // svg.append("rect")
+            //     .attr("class", "overlay")
+            //     .attr("width", width)
+            //     .attr("height", height)
+            //     .on("mouseover", function() {
+            //         var x0 = x.invert(d3.mouse(this)[0]);
+            //         var s1 = _.minBy(data, function(d) {
+            //             return Math.abs(moment(x0).unix()-d.unixtime);
+            //         });
+            //         tip.show(s1, this);
+            //         tip.style("left", d3.event.pageX + 10 + "px");
+            //         tip.style("top", d3.event.pageY + 25 + "px");
+            //         focus.style("display", null);
+            //      })
+            //     .on("mouseout", function() { tip.hide(); focus.style("display", "none"); })
+            //     .on("mousemove", mousemove);
 
 
-            function mousemove() {
-                var x0 = x.invert(d3.mouse(this)[0]);
-                //console.log(moment(x0).unix());
+            // function mousemove() {
+            //     var x0 = x.invert(d3.mouse(this)[0]);
+            //     //console.log(moment(x0).unix());
 
-                var s1 = _.minBy(data, function(d) {
-                    //console.log(d.unixtime);
-                    return Math.abs(moment(x0).unix()-d.unixtime);
-                });
+            //     var s1 = _.minBy(data, function(d) {
+            //         //console.log(d.unixtime);
+            //         return Math.abs(moment(x0).unix()-d.unixtime);
+            //     });
 
-                //console.log(moment(s1.unixtime*1000).format());
-                //console.log(s1.instantHashrate);
+            //     //console.log(moment(s1.unixtime*1000).format());
+            //     //console.log(s1.instantHashrate);
 
-                tip.show(s1, this);
-                tip.style("left", d3.event.pageX + 10 + "px");
-                tip.style("top", d3.event.pageY + 25 + "px");
+            //     tip.show(s1, this);
+            //     tip.style("left", d3.event.pageX + 10 + "px");
+            //     tip.style("top", d3.event.pageY + 25 + "px");
 
-                //focus.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
-                focus.attr("transform", "translate(" + x(moment(x0).unix()*1000) + "," + y(s1.instantHashrate) + ")");
-            }
+            //     //focus.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
+            //     focus.attr("transform", "translate(" + x(moment(x0).unix()*1000) + "," + y(s1.instantHashrate) + ")");
+            // }
 
 
 
@@ -643,37 +643,37 @@ angular.module('BlocksApp').controller('StatsController', function($stateParams,
 
             svg.call(tip);
 
-            svg.append("rect")
-                .attr("class", "overlay")
-                .attr("width", width)
-                .attr("height", height)
-                .on("mouseover", function() {
-                    var x0 = x.invert(d3.mouse(this)[0]);
-                    var s1 = _.minBy(data, function(d) {
-                        return Math.abs(moment(x0).unix()-d.unixtime);
-                    });
-                    tip.show(s1, this);
-                    tip.style("left", d3.event.pageX + 10 + "px");
-                    tip.style("top", d3.event.pageY + 25 + "px");
-                    focus.style("display", null);
-                 })
-                .on("mouseout", function() { tip.hide(); focus.style("display", "none"); })
-                .on("mousemove", mousemove);
+            // svg.append("rect")
+            //     .attr("class", "overlay")
+            //     .attr("width", width)
+            //     .attr("height", height)
+            //     .on("mouseover", function() {
+            //         var x0 = x.invert(d3.mouse(this)[0]);
+            //         var s1 = _.minBy(data, function(d) {
+            //             return Math.abs(moment(x0).unix()-d.unixtime);
+            //         });
+            //         tip.show(s1, this);
+            //         tip.style("left", d3.event.pageX + 10 + "px");
+            //         tip.style("top", d3.event.pageY + 25 + "px");
+            //         focus.style("display", null);
+            //      })
+            //     .on("mouseout", function() { tip.hide(); focus.style("display", "none"); })
+            //     .on("mousemove", mousemove);
 
-            function mousemove() {
-                var x0 = x.invert(d3.mouse(this)[0]);
+            // function mousemove() {
+            //     var x0 = x.invert(d3.mouse(this)[0]);
 
-                var s1 = _.minBy(data, function(d) {
-                    return Math.abs(moment(x0).unix()-d.unixtime);
-                });
+            //     var s1 = _.minBy(data, function(d) {
+            //         return Math.abs(moment(x0).unix()-d.unixtime);
+            //     });
 
-                tip.show(s1, this);
-                tip.style("left", d3.event.pageX + 10 + "px");
-                tip.style("top", d3.event.pageY + 25 + "px");
+            //     tip.show(s1, this);
+            //     tip.style("left", d3.event.pageX + 10 + "px");
+            //     tip.style("top", d3.event.pageY + 25 + "px");
 
-                //focus.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
-                focus.attr("transform", "translate(" + x(moment(x0).unix()*1000) + "," + y(s1.difficulty) + ")");
-            }
+            //     //focus.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
+            //     focus.attr("transform", "translate(" + x(moment(x0).unix()*1000) + "," + y(s1.difficulty) + ")");
+            // }
 
             callback(null, 'three');
         }
@@ -855,36 +855,36 @@ angular.module('BlocksApp').controller('StatsController', function($stateParams,
 
             svg.call(tip);
 
-            svg.append("rect")
-                .attr("class", "overlay")
-                .attr("width", width)
-                .attr("height", height)
-                .on("mouseover", function() {
-                    var x0 = x.invert(d3.mouse(this)[0]);
-                    var s1 = _.minBy(data, function(d) {
-                        return Math.abs(moment(x0).unix()-d.unixtime);
-                    });
-                    tip.show(s1, this);
-                    tip.style("left", d3.event.pageX + 10 + "px");
-                    tip.style("top", d3.event.pageY + 25 + "px");
-                    focus.style("display", null);
-                 })
-                .on("mouseout", function() { tip.hide(); focus.style("display", "none"); })
-                .on("mousemove", mousemove);
+            // svg.append("rect")
+            //     .attr("class", "overlay")
+            //     .attr("width", width)
+            //     .attr("height", height)
+            //     .on("mouseover", function() {
+            //         var x0 = x.invert(d3.mouse(this)[0]);
+            //         var s1 = _.minBy(data, function(d) {
+            //             return Math.abs(moment(x0).unix()-d.unixtime);
+            //         });
+            //         tip.show(s1, this);
+            //         tip.style("left", d3.event.pageX + 10 + "px");
+            //         tip.style("top", d3.event.pageY + 25 + "px");
+            //         focus.style("display", null);
+            //      })
+            //     .on("mouseout", function() { tip.hide(); focus.style("display", "none"); })
+            //     .on("mousemove", mousemove);
 
-            function mousemove() {
-                var x0 = x.invert(d3.mouse(this)[0]);
+            // function mousemove() {
+            //     var x0 = x.invert(d3.mouse(this)[0]);
 
-                var s1 = _.minBy(data, function(d) {
-                    return Math.abs(moment(x0).unix()-d.unixtime);
-                });
+            //     var s1 = _.minBy(data, function(d) {
+            //         return Math.abs(moment(x0).unix()-d.unixtime);
+            //     });
 
-                tip.show(s1, this);
-                tip.style("left", d3.event.pageX + 10 + "px");
-                tip.style("top", d3.event.pageY + 25 + "px");
+            //     tip.show(s1, this);
+            //     tip.style("left", d3.event.pageX + 10 + "px");
+            //     tip.style("top", d3.event.pageY + 25 + "px");
 
-                focus.attr("transform", "translate(" + x(moment(x0).unix()*1000) + "," + y(s1.blockTime) + ")");
-            }
+            //     focus.attr("transform", "translate(" + x(moment(x0).unix()*1000) + "," + y(s1.blockTime) + ")");
+            // }
 
             callback(null, 'three');
         }

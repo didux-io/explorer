@@ -41,12 +41,12 @@
         <li class="active">
           <a href="/">Home</a>
         </li>
-        <li ng-show="settings.useRichList">
+        <!-- <li ng-show="settings.useRichList">
           <a href="/accounts">Accounts</a>
-        </li>
-        <li>
+        </li> -->
+        <!-- <li>
           <a href="/token">Tokens</a>
-        </li>
+        </li> -->
         <li class="menu-dropdown mega-menu-dropdown ">
           <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="#" class="dropdown-toggle"> Stats
           <i class="fa fa-angle-down"></i>
@@ -57,7 +57,7 @@
                 <div class="row">
                   <div class="col-md-12">
                     <ul class="mega-menu-submenu">
-                      <li>
+                      <!-- <li>
                         <a href="/stats/hashrate">
                         <i class="fa fa-line-chart"></i> Hashrate Chart </a>
                       </li>
@@ -68,6 +68,10 @@
                       <li>
                         <a href="/stats/difficulty">
                         <i class="fa fa-line-chart"></i> Difficulty Chart</a>
+                      </li> -->
+                      <li>
+                        <a ng-click='openGlobalJsonUrl()' href="/stats">
+                        <i class="fa fa-line-chart"></i> Global JSON Stats</a>
                       </li>
                       <li>
                         <a href="/stats/blocktime">
@@ -91,7 +95,7 @@
             </li>
           </ul>
         </li>
-        <li class="menu-dropdown classic-menu-dropdown ">
+        <!-- <li class="menu-dropdown classic-menu-dropdown ">
           <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="#"> Community
           <i class="fa fa-angle-down"></i>
           </a>
@@ -127,7 +131,7 @@
               </a>
             </li>
           </ul>
-        </li>
+        </li> -->
       </ul>
     </div>
     <!-- END MEGA MENU -->

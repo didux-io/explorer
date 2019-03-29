@@ -91,5 +91,5 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
     });
   };
 
-  getAccounts();
+  // getAccounts();
 });

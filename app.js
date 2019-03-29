@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 require( './db' );
-require( './db-stats' );
 
 const express = require('express');
 const path = require('path');
@@ -29,67 +28,17 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(favicon(`${__dirname}/public/favicon.ico`));
+app.use(favicon(`${__dirname}/public/favicon.png`));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app libraries
-global.__lib = __dirname + '/lib/';
-
-let fs = require('fs');
-
-let config = {};
-
-try {
-    let configContents = fs.readFileSync('tools/config.json');
-    config = JSON.parse(configContents);
-}
-catch (error) {
-    if (error.code === 'ENOENT') {
-        console.log('No config file found. Using default configuration (will ' + 
-            'download all blocks starting from latest)');
-    }
-    else {
-        throw error;
-        process.exit(1);
-    }
-}
-
-// set the default geth address if it's not provided
-if (!('gethAddress' in config) || (typeof config.gethAddress) !== 'string') {
-    config.gethAddress = "localhost"; // default
-}
-
-// set the default geth port if it's not provided
-if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {
-    config.gethPort = 8545; // default
-}
-
-// set the default output directory if it's not provided
-if (!('output' in config) || (typeof config.output) !== 'string') {
-    config.output = '.'; // default this directory
-}
-
-// set the default blocks if it's not provided
-if (!('blocks' in config) || !(Array.isArray(config.blocks))) {
-    config.blocks = [];
-    config.blocks.push({'start': 0, 'end': 'latest'});
-}
-
 console.log('Using configuration:');
 console.log(config);
 
 let Web3 = require('web3');
-let web3 = new Web3(
-    new Web3.providers.HttpProvider(
-        'https://' + 
-        config.gethAddress.toString() + 
-        ':' + 
-        config.gethPort.toString()
-    )
-);
+let web3 = new Web3(new Web3.providers.WebsocketProvider(`ws://${config.nodeAddr}:${config.wsPort}`));
 
 let mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
@@ -98,26 +47,29 @@ let BlockStats = mongoose.model('BlockStat');
 let MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
 app.get("/stats", async function (req, res) {
-    let blockStats = await BlockStats.find({});
-    let totalAverageTime = 0;
-    let amountOfBlocksProcessed = 0;
-    blockStats.forEach(blockStat => {
-        totalAverageTime += blockStat.blockTime;
-        amountOfBlocksProcessed++;
-    });
-    let averageBlockTimeInSec = totalAverageTime / amountOfBlocksProcessed;
-    let latestBlock = await web3.eth.getBlock("latest").number;
-    let totalXsmCreated = getTotalXsmCreated(latestBlock);
+  let blockStats = await BlockStats.find({});
+  let totalAverageTime = 0;
+  let amountOfBlocksProcessed = 0;
+  blockStats.forEach(blockStat => {
+      totalAverageTime += blockStat.blockTime;
+      amountOfBlocksProcessed++;
+  });
+  let averageBlockTimeInSec = totalAverageTime / amountOfBlocksProcessed;
+  let latestBlockObj = await web3.eth.getBlock("latest");
+  let latestBlockNumber = latestBlockObj.number;
+  let totalXsmCreated = getTotalXsmCreated(latestBlockNumber);
 
-    let minedBlocksCountResult = await MinedBlocksCount.findOne({type: "global"});
+  let minedBlocksCountResult = await MinedBlocksCount.findOne({type: "global"});
 
-    res.send({
-        lastBlock: latestBlock,
-        totalXsm: totalXsmCreated,
-        totalTransactions: minedBlocksCountResult ? minedBlocksCountResult.amount : 0,
-        averageBlockTimeInSecLast1000Blocks: isNaN(averageBlockTimeInSec) ? "-1" : averageBlockTimeInSec.toFixed(2),
-        gasPrice: web3.eth.gasPrice
-    });
+  let gasPrice = await web3.eth.getGasPrice();
+
+  res.send({
+      lastBlock: latestBlockNumber,
+      totalXsm: totalXsmCreated,
+      totalTransactions: minedBlocksCountResult ? minedBlocksCountResult.amount : 0,
+      averageBlockTimeInSecLast1000Blocks: isNaN(averageBlockTimeInSec) ? "-1" : averageBlockTimeInSec.toFixed(2),
+      gasPrice: gasPrice
+  });
 });
 
 // https://github.com/Smilo-platform/Wiki/wiki/Masternode-block-reward

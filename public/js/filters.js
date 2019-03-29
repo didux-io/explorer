@@ -45,8 +45,7 @@ var getDifficulty = function(hashes) {
     result = hashes / Math.pow(1000, 7);
     unit = 'Z';
   }
-  
-  return result.toFixed(2) + ' ' + unit + 'H';
+  return Number(result).toFixed(2) + ' ' + unit + 'H';
 }
 
 /*

@@ -26,30 +26,6 @@ var Block = new Schema(
     "blockReward": Number
 });
 
-const Block = new Schema(
-  {
-    'number': { type: Number, index: { unique: true } },
-    'hash': String,
-    'parentHash': String,
-    'nonce': String,
-    'sha3Uncles': String,
-    'logsBloom': String,
-    'transactionsRoot': String,
-    'stateRoot': String,
-    'receiptRoot': String,
-    'miner': { type: String, lowercase: true },
-    'difficulty': String,
-    'totalDifficulty': String,
-    'size': Number,
-    'extraData': String,
-    'gasLimit': Number,
-    'gasUsed': Number,
-    'timestamp': Number,
-    'blockTime': Number,
-    'uncles': [String],
-  }, { collection: 'Block' },
-);
-
 const Account = new Schema(
   {
     'address': { type: String, index: { unique: true } },
@@ -100,11 +76,12 @@ const Transaction = new Schema(
 );
 
 var MinedBlocksCount = new Schema(
-{
+  {
     "type": String,
     "amount": Number,
     "address": {type: String, index: {unique: true}}
-});
+  }, { collection: 'MinedBlocksCount' }
+);
 
 const TokenTransfer = new Schema(
   {
