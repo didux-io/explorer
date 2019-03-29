@@ -1,8 +1,0 @@
-{
-    "gethAddress": "testnet-wallet.smilo.network/api",
-    "gethPort": 443, 
-    "blocks": [ {"start": 2000000, "end": "latest"}],
-    "quiet": false,
-    "terminateAtExistingDB": false,
-    "listenOnly": false
-}

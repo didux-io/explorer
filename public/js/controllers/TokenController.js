@@ -12,18 +12,20 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
     $scope.addrHash = isAddress($stateParams.hash) ? $stateParams.hash : undefined;
     var address = $scope.addrHash;
     $scope.token = {"balance": 0};
+    $scope.settings = $rootScope.setup;
 
     //fetch dao stuff
     $http({
       method: 'POST',
       url: '/tokenrelay',
       data: {"action": "info", "address": address}
-    }).success(function(data) {
-      $scope.token = data;
+    }).then(function(resp) {
+      console.log(resp.data)
+      $scope.token = resp.data;
       $scope.token.address = address;
-      $scope.addr = {"bytecode": data.bytecode};
-      if (data.name)
-        $rootScope.$state.current.data["pageTitle"] = data.name;
+      $scope.addr = {"bytecode": resp.data.bytecode};
+      if (resp.data.name)
+        $rootScope.$state.current.data["pageTitle"] = resp.data.name;
     });
 
     $scope.form = {};
@@ -42,9 +44,10 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
             method: 'POST',
             url: '/tokenrelay',
             data: {"action": "balanceOf", "user": addr, "address": address}
-          }).success(function(data) {
+          }).then(function(resp) {
+            console.log(resp.data)
             $scope.showTokens = true;
-            $scope.userTokens = data.tokens;
+            $scope.userTokens = resp.data.tokens;
           });
         } else 
             $scope.errors.address = "Invalid Address";
@@ -63,8 +66,8 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
           method: 'POST',
           url: '/compile',
           data: {"addr": scope.addrHash, "action": "find"}
-        }).success(function(data) {
-          scope.contract = data;
+        }).then(function(resp) {
+          scope.contract = resp.data;
         });
       }
   }

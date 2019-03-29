@@ -26,17 +26,18 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
 
     $rootScope.$state.current.data["pageSubTitle"] = $stateParams.hash;
     $scope.addrHash = $stateParams.hash;
-    $scope.addr = {"balance": 0, "count": 0};
+    $scope.addr = {"balance": 0, "count": 0, "mined": 0};
+    $scope.settings = $rootScope.setup;
 
     //fetch web3 stuff
     $http({
       method: 'POST',
       url: '/web3relay',
       data: {"addr": $scope.addrHash, "options": ["balance", "count", "bytecode"]}
-    }).success(function(data) {
-      $scope.addr = data;
-      fetchTxs($scope.addr.count);
-      if (data.isContract) {
+    }).then(function(resp) {
+      $scope.addr = $.extend($scope.addr, resp.data);
+      fetchTxs();
+      if (resp.data.isContract) {
         $rootScope.$state.current.data["pageTitle"] = "Contract Address";
         // fetchInternalTxs();
       }
@@ -124,26 +125,50 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
     }
 
     //fetch transactions
-    var fetchTxs = function(count) {
-      if (transactionBlocksTableExists) {
-        return;
-      }
-      transactionBlocksTableExists = true;
-      $("#table_txs").DataTable({
+    var fetchTxs = function() {
+      var table = $("#table_txs").DataTable({
         processing: true,
         serverSide: true,
         searching: false,
         paging: true,
-        ajax: {
-          url: '/addr',
-          type: 'POST',
-          data: { "addr": $scope.addrHash, "count": count }
+        ajax: function(data, callback, settings) {
+          data.addr = $scope.addrHash;
+          data.count = $scope.addr.count;
+          $http.post('/addr', data).then(function(resp) {
+            // save data
+            $scope.data = resp.data;
+            // check $scope.records* if available.
+            resp.data.recordsTotal = $scope.recordsTotal ? $scope.recordsTotal : resp.data.recordsTotal;
+            resp.data.recordsFiltered = $scope.recordsFiltered ? $scope.recordsFiltered : resp.data.recordsFiltered;
+            callback(resp.data);
+          });
+
+          // get mined, recordsTotal counter only once.
+          if (data.draw > 1)
+            return;
+
+          $http.post('/addr_count', data).then(function(resp) {
+            $scope.addr.count = resp.data.recordsTotal;
+            $scope.addr.mined = parseInt(resp.data.mined);
+
+            data.count = resp.data.recordsTotal;
+
+            // set $scope.records*
+            $scope.recordsTotal = resp.data.recordsTotal;
+            $scope.recordsFiltered = resp.data.recordsFiltered;
+            // draw table if $scope.data available.
+            if ($scope.data) {
+              $scope.data.recordsTotal = resp.data.recordsTotal;
+              $scope.data.recordsFiltered = resp.data.recordsFiltered;
+              callback($scope.data);
+            }
+          });
         },
         "lengthMenu": [
-                    [10, 20, 50, 100, 150, -1],
-                    [10, 20, 50, 100, 150, "All"] // change per page values here
+                    [10, 20, 50, 100, 150, 500],
+                    [10, 20, 50, 100, 150, 500] // change per page values here
                 ],
-        "pageLength": 20, 
+        "pageLength": 20,
         "order": [
             [6, "desc"]
         ],
@@ -153,10 +178,10 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           "infoEmpty": "",
           "infoFiltered": "(filtered from _MAX_ total txs)"
         },
-        "columnDefs": [ 
+        "columnDefs": [
           { "targets": [ 5 ], "visible": false, "searchable": false },
           {"type": "date", "targets": 6},
-          {"orderable": false, "targets": [0,2,3]},
+          {"orderable": false, "targets": [0,2,3,4]},
           { "render": function(data, type, row) {
                         return '<a href="/addr/'+data+'">'+data+'</a>'
                       }, "targets": [2,3]},
@@ -176,16 +201,16 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
       });
     }
 
-    // var fetchInternalTxs = function() {
-    //   $http({
-    //     method: 'POST',
-    //     url: '/web3relay',
-    //     data: {"addr_trace": $scope.addrHash}
-    //   }).success(function(data) {
-    //     $scope.internal_transactions = data;
-    //   });      
-    // }
-    
+    var fetchInternalTxs = function() {
+      $http({
+        method: 'POST',
+        url: '/web3relay',
+        data: {"addr_trace": $scope.addrHash}
+      }).then(function(resp) {
+        $scope.internal_transactions = resp.data;
+      });
+    }
+
 })
 .directive('contractSource', function($http) {
   return {
@@ -198,8 +223,9 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           method: 'POST',
           url: '/compile',
           data: {"addr": scope.addrHash, "action": "find"}
-        }).success(function(data) {
-          scope.contract = data;
+        }).then(function(resp) {
+          console.log(resp.data);
+          scope.contract = resp.data;
         });
       }
   }
