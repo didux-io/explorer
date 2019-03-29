@@ -147,7 +147,7 @@ var getMinedBlocks = async function(req, res) {
   var start = parseInt(req.body.start);
 
   console.log('getMinedBlocks LEAN EXECUTE');
-  minedBlocks.lean(true).skip(start).limit(limit)
+  minedBlocks.lean(true).skip(start).limit(limit).sort({timestamp: -1})
             .exec("find", function (err, docs) {
               // console.log('Docs:', docs);
               if (docs)
