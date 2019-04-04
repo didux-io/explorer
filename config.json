@@ -29,9 +29,9 @@
         "useRichList": false,
         "useFiat": false,
         "miners": {
-            "0xdf7d7e053933b5cc24372f878c90e62dadad5d42": "EtherMine",
-            "0xc91716199ccde49dc4fafaeb68925127ac80443f": "F2Pool",
-            "0x9eab4b0fc468a7f5d46228bf5a76cb52370d068d": "NanoPool",
+            "0x18376081F21B97e7E6678a9e82B8d45928509f57": "Smilo Foundation",
+            "0x0fbc07ebdCE2BfeAd66F1686D67f9EA5c759E433": "Smilo Foundation",
+            "0x7cB791430D2461268691bfBA6e35d8a8C7eA2E63": "Smilo Foundation",
             "0x1C0FA194a9d3B44313DCD849F3C6be6Ad270a0A4": "MiningPoolHub",
             "0x4750e296949b747df1585aa67beee8be903dd560": "UUPool",
             "0xef224fa5fad302b51f38898f4df499d7af127af0": "91pool",

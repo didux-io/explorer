@@ -38,7 +38,7 @@ console.log('Using configuration:');
 console.log(config);
 
 let Web3 = require('web3');
-let web3 = new Web3(new Web3.providers.WebsocketProvider(`ws://${config.nodeAddr}:${config.wsPort}`));
+let web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
 
 let mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
