@@ -72,6 +72,10 @@ app.get("/stats", async function (req, res) {
   });
 });
 
+var keepAlive = setInterval(async function() {
+    console.log(await web3.eth.getNodeInfo());
+}, 300 * 1000);
+
 // https://github.com/Smilo-platform/Wiki/wiki/Masternode-block-reward
 function getTotalXsmCreated(totalBlocks) {
     if(totalBlocks >= 3200000000)

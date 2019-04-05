@@ -62,6 +62,10 @@ async function detectNode() {
 }
 detectNode();
 
+var keepAlive = setInterval(async function() {
+    console.log(await web3.eth.getNodeInfo());
+}, 300 * 1000);
+
 exports.data = async (req, res) => {
   console.log(req.body);
 
