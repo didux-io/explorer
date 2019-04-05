@@ -6,8 +6,6 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
 
     let minedBlocksTableExists = false;
     let transactionBlocksTableExists = false;
-    
-    $rootScope.showHeaderPageTitle = true;
 
     $scope.changeActiveTab = function (tabId) {
       $scope.activeTab = 'tab_addr_'+ tabId;

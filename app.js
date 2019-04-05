@@ -65,7 +65,7 @@ app.get("/stats", async function (req, res) {
 
   res.send({
       lastBlock: latestBlockNumber,
-      totalXsm: totalXsmCreated,
+      current_supply: totalXsmCreated,
       totalTransactions: minedBlocksCountResult ? minedBlocksCountResult.amount : 0,
       averageBlockTimeInSecLast1000Blocks: isNaN(averageBlockTimeInSec) ? "-1" : averageBlockTimeInSec.toFixed(2),
       gasPrice: gasPrice

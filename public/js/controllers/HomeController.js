@@ -6,8 +6,6 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
 
     var URL = '/data';
 
-    $rootScope.showHeaderPageTitle = false;
-
     $scope.reloadBlocks = function() {
       $scope.blockLoading = true;
       $http({
@@ -35,6 +33,14 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
     $scope.txLoading = false;
     $scope.blockLoading = false;
     $scope.settings = $rootScope.setup;
+
+    let refreshInterval = setInterval(() => {
+      $scope.reloadBlocks();
+      $scope.reloadTransactions();
+    }, 5000);
+    $scope.$on('$destroy', () => {
+      clearInterval(refreshInterval);
+    });
 })
 .directive('simpleSummaryStats', function($http) {
   return {

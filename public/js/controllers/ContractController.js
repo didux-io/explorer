@@ -1,5 +1,4 @@
 angular.module('BlocksApp').controller('ContractController', function($stateParams, $rootScope, $scope, $http) {
-    $rootScope.showHeaderPageTitle = true;
     $rootScope.$state.current.data["pageSubTitle"] = $stateParams.addr;
 
     //fetch compiler options

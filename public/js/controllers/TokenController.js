@@ -3,7 +3,6 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
         // initialize core components
         App.initAjax();
     });
-    $rootScope.showHeaderPageTitle = true;
     var activeTab = $location.url().split('#');
     if (activeTab.length > 1)
       $scope.activeTab = activeTab[1];

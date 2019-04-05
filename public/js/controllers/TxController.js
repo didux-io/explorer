@@ -4,8 +4,6 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
         App.initAjax();
     });
 
-    $rootScope.showHeaderPageTitle = true;
-
     $rootScope.$state.current.data["pageSubTitle"] = $stateParams.hash;
     $scope.hash = $stateParams.hash;
     $scope.tx = {"hash": $scope.hash};

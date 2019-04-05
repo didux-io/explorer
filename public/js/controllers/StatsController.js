@@ -1,6 +1,4 @@
 angular.module('BlocksApp').controller('StatsController', function($stateParams, $rootScope, $scope) {
-
-    $rootScope.showHeaderPageTitle = true;  
     $scope.settings = $rootScope.setup;
 
     /*

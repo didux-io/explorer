@@ -4,7 +4,6 @@ angular.module('BlocksApp').controller('TokenListController', function($statePar
         App.initAjax();
     });
     $scope.settings = $rootScope.setup;
-    $rootScope.showHeaderPageTitle = true;
 
     var tokenList = '/' + ($scope.settings.tokenList || 'tokens.json');
     $http.get(tokenList)
