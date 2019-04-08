@@ -71,6 +71,7 @@ exports.data = async (req, res) => {
 
   if ('tx' in req.body) {
     var txHash = req.body.tx.toLowerCase();
+    let txResponse = null;
 
     Transaction.findOne({ hash: txHash }).lean(true).exec(async (err, doc) => {
       if (err || !doc) {
@@ -125,23 +126,25 @@ exports.data = async (req, res) => {
 
       const latestBlock = await web3.eth.getBlockNumber() + 1;
 
-      txResponse.confirmations = latestBlock - txResponse.blockNumber;
+      if (txResponse != null){
+          txResponse.confirmations = latestBlock - txResponse.blockNumber;
 
-      if (txResponse.confirmations === latestBlock) {
-        txResponse.confirmation = 0;
+          if (txResponse.confirmations === latestBlock) {
+              txResponse.confirmation = 0;
+          }
+          txResponse.gasPriceGwei = etherUnits.toGwei(new BigNumber(txResponse.gasPrice), 'wei');
+          txResponse.gasPriceEther = etherUnits.toEther(new BigNumber(txResponse.gasPrice), 'wei');
+          txResponse.txFee = txResponse.gasPriceEther * txResponse.gasUsed;
+
+          if (config.settings.useFiat) {
+              const latestPrice = await Market.findOne().sort({ timestamp: -1 });
+              txResponse.txFeeUSD = txResponse.txFee * latestPrice.quoteUSD;
+              txResponse.valueUSD = txResponse.value * latestPrice.quoteUSD;
+          }
+
+          res.write(JSON.stringify(txResponse));
+          res.end();
       }
-      txResponse.gasPriceGwei = etherUnits.toGwei(new BigNumber(txResponse.gasPrice), 'wei');
-      txResponse.gasPriceEther = etherUnits.toEther(new BigNumber(txResponse.gasPrice), 'wei');
-      txResponse.txFee = txResponse.gasPriceEther * txResponse.gasUsed;
-
-      if (config.settings.useFiat) {
-        const latestPrice = await Market.findOne().sort({ timestamp: -1 });
-        txResponse.txFeeUSD = txResponse.txFee * latestPrice.quoteUSD;
-        txResponse.valueUSD = txResponse.value * latestPrice.quoteUSD;
-      }
-
-      res.write(JSON.stringify(txResponse));
-      res.end();
     });
 
   } else if ('tx_trace' in req.body) {
