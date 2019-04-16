@@ -5,7 +5,7 @@ var fs = require("fs");
     Endpoint for client to talk to etc node
 */
 
-const Web3 = require('web3');
+let Web3 = require('web3');
 const web3explorer = require('web3-explorer');
 
 let web3;
@@ -63,7 +63,13 @@ async function detectNode() {
 detectNode();
 
 var keepAlive = setInterval(async function() {
-    console.log(await web3.eth.getNodeInfo());
+    try {
+      console.log('Keep alive request - web3relay.js');
+      console.log(await web3.eth.getNodeInfo());
+    } catch(error) {
+      console.log('Error in keep alive ws request. Reconnecting to node - web3relay.js');
+      web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
+    }
 }, 300 * 1000);
 
 exports.data = async (req, res) => {

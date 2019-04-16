@@ -27,13 +27,23 @@ try {
 
 console.log(`Connecting ${config.nodeAddr}:${config.wsPort}...`);
 // Sets address for RPC WEB3 to connect to, usually your node IP address defaults ot localhost
-const web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort.toString()}`));
+let web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort.toString()}`));
 
 if (web3.eth.net.isListening()) console.log('stats.js - Web3 connection established');
 else throw 'stats.js - No connection, please specify web3host in conf.json';
 if ('quiet' in config && config.quiet === true) {
   console.log('Quiet mode enabled');
 }
+
+var keepAlive = setInterval(async function() {
+  try {
+    console.log('Keep alive request - stats.js');
+    console.log(await web3.eth.getNodeInfo());
+  } catch(error) {
+    console.log('Error in keep alive ws request. Reconnecting to node - stats.js');
+    web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort.toString()}`));
+  }
+}, 300 * 1000);
 
 const updateStats = async (range, interval, rescan) => {
   let latestBlock = await web3.eth.getBlockNumber();

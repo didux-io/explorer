@@ -73,7 +73,13 @@ app.get("/stats", async function (req, res) {
 });
 
 var keepAlive = setInterval(async function() {
-    console.log(await web3.eth.getNodeInfo());
+    try {
+      console.log('Keep alive request - app.js');
+      console.log(await web3.eth.getNodeInfo());
+    } catch(error) {
+      console.log('Error in keep alive ws request. Reconnecting to node - app.js');
+      web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
+    }
 }, 300 * 1000);
 
 // https://github.com/Smilo-platform/Wiki/wiki/Masternode-block-reward
