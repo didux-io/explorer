@@ -8,6 +8,10 @@ services:
     build:
       context: .
       dockerfile: grabber.Dockerfile
+  internals:
+    build:
+      context: .
+      dockerfile: internals.Dockerfile
   app:
     build:
       context: .

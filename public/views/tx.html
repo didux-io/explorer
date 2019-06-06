@@ -18,14 +18,14 @@
                 <td><a href="/addr/{{tx.to}}">{{tx.to}}</a></td></tr>
           <tr ng-show="tx.creates"><td width="25%">creates</td>
                 <td><a href="/addr/{{tx.creates}}">{{tx.creates}}</a></td></tr>                
-          <tr ><td width="25%">value</td><td>{{tx.value}} Smilo</td></tr>
+          <tr ><td width="25%">value</td><td>{{tx.value}} XSM</td></tr>
           <tr ><td width="25%">gas Provided</td><td>{{tx.gas}}</td></tr>
           <tr ><td width="25%">gasPrice</td><td>{{tx.gasPrice}}</td></tr>
           <tr ><td width="25%">nonce</td><td>{{tx.nonce}}</td></tr>
           <tr ><td width="25%">Input Data</td><td><pre class="code">{{tx.input}}</pre></td></tr>
         </table>
 
-        <table class="table table-condensed" ng-show="tx.isTrace">
+        <!-- <table class="table table-condensed" ng-show="tx.isTrace">
           <thead>
               <tr>
                   <th> From </th>
@@ -46,7 +46,7 @@
                   <td style="text-align:center"><span class="label label-sm label-info {{t.type}}"> {{t.type}}</span><span class="label label-sm label-danger" ng-show="t.error"> {{t.error}}</span></td>
               </tr>
           </tbody>
-        </table>
+        </table> -->
     </div>
 
   </div>
