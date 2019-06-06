@@ -60,7 +60,7 @@ console.log(config);
 if (typeof web3 !== "undefined") {
   web3 = new Web3(web3.currentProvider);
 } else {
-  web3 = new Web3(new Web3.providers.HttpProvider("http://" + config.gethAddress + ":" + config.gethPort));
+  web3 = new Web3(new Web3.providers.HttpProvider("https://" + config.gethAddress + ":" + config.gethPort));
 }
 
 if (web3.isConnected()) 
@@ -99,7 +99,6 @@ exports.data = function(req, res){
 
   } else if ("tx_trace" in req.body) {
     var txHash = req.body.tx_trace.toLowerCase();
-
     web3.trace.transaction(txHash, function(err, tx) {
       if(err || !tx) {
         console.error("TraceWeb3 error :" + err)

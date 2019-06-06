@@ -22,25 +22,24 @@ var getTx = function() {
                 txData.timestamp = doc.timestamp;
                 bulkOps.push(txData);
             }
-              Transaction.collection.insert(bulkOps, function( err, tx ){
-                if ( typeof err !== 'undefined' && err ) {
-                    if (err.code == 11000) {
-                        console.log('Skip: Duplicate key ' + 
-                        err);
-                    } else {
-                       console.log('Error: Aborted due to error: ' + 
-                            err);
-                       process.exit(9);
-                   }
+            Transaction.collection.insert(bulkOps, function( err, tx ){
+            if ( typeof err !== 'undefined' && err ) {
+                if (err.code == 11000) {
+                    console.log('Skip: Duplicate key ' + 
+                    err);
                 } else {
-                    console.log('DB successfully written for block ' +
-                        tx.length.toString() );
-                    
+                    console.log('Error: Aborted due to error: ' + 
+                        err);
+                    process.exit(9);
                 }
-                bulkOps = [];
-                cb();
-              });
-        
+            } else {
+                console.log('DB successfully written for block ' +
+                    tx.length.toString() );
+                
+            }
+            bulkOps = [];
+            cb();
+            });
           }
     }, function() { return; });
       });  

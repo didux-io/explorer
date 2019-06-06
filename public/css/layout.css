@@ -80,9 +80,8 @@
 .page-header .page-header-top .page-logo {
     float: left;
     display: block;
-    width: 255px;
-    height: 75px;
     position: absolute;
+    z-index: 10;
 }
 
 .page-header .page-header-top .top-menu {
@@ -655,7 +654,7 @@
     position: relative;
     display: inline-block;
     float: right;
-    width: 176px;
+    width: 400px;
     transition: width .4s;
     margin-top: 8px;
     -webkit-border-radius: 4px;
@@ -697,7 +696,7 @@
 }
 
 .search-form.open {
-    width: 300px !important;
+    width: 500px !important;
     transition: width .4s;
 }
 

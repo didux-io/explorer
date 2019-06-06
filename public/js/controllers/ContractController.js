@@ -4,6 +4,8 @@ angular.module('BlocksApp').controller('ContractController', function($statePara
         App.initAjax();
     });
 
+    $rootScope.showHeaderPageTitle = true;
+
     $rootScope.$state.current.data["pageSubTitle"] = $stateParams.addr;
 
     //fetch compiler options
@@ -34,7 +36,6 @@ angular.module('BlocksApp').controller('ContractController', function($statePara
     $scope.errors = {};
     
     $scope.submitCode = function() {
-      console.log($scope.contract)
       $scope.errors = {};
       $("#submitCodeBtn").button("loading");
 
@@ -60,7 +61,6 @@ angular.module('BlocksApp').controller('ContractController', function($statePara
           data: contractReq
         }).success(function(data) {
           $("#submitCodeBtn").button("reset");
-          console.log(data);
           $scope.contract = data;
           $scope.contract.compiled = true;
         });

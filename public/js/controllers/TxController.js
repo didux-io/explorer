@@ -4,6 +4,8 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
         App.initAjax();
     });
 
+    $rootScope.showHeaderPageTitle = true;
+
     $rootScope.$state.current.data["pageSubTitle"] = $stateParams.hash;
     $scope.hash = $stateParams.hash;
     $scope.tx = {"hash": $scope.hash};
@@ -17,17 +19,17 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
       $scope.tx = data;
       if (data.timestamp)
         $scope.tx.datetime = new Date(data.timestamp*1000); 
-      if (data.isTrace) // Get internal txs
-        fetchInternalTxs();
+      // if (data.isTrace) // Get internal txs
+      //   fetchInternalTxs();
     });
 
-    var fetchInternalTxs = function() {
-      $http({
-        method: 'POST',
-        url: '/web3relay',
-        data: {"tx_trace": $scope.hash}
-      }).success(function(data) {
-        $scope.internal_transactions = data;
-      });      
-    }
+    // var fetchInternalTxs = function() {
+    //   $http({
+    //     method: 'POST',
+    //     url: '/web3relay',
+    //     data: {"tx_trace": $scope.hash}
+    //   }).success(function(data) {
+    //     $scope.internal_transactions = data;
+    //   });      
+    // }
 })

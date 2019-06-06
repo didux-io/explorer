@@ -3,6 +3,8 @@ angular.module('BlocksApp').controller('DAOController', function($stateParams, $
         // initialize core components
         App.initAjax();
     });
+
+    $rootScope.showHeaderPageTitle = true;
     var activeTab = $location.url().split('#');
     if (activeTab.length > 1)
       $scope.activeTab = activeTab[1];
@@ -35,7 +37,6 @@ angular.module('BlocksApp').controller('DAOController', function($stateParams, $
             url: '/daorelay',
             data: {"action": "balanceOf", "addr": addr}
           }).success(function(data) {
-            console.log(data)
             $scope.showTokens = true;
             $scope.dao.tokens = data.tokens;
           });
