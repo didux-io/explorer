@@ -38,7 +38,7 @@ console.log('Using configuration:');
 console.log(config);
 
 let Web3 = require('web3');
-let web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
+let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
 
 let mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
@@ -78,7 +78,7 @@ var keepAlive = setInterval(async function() {
       console.log(await web3.eth.getNodeInfo());
     } catch(error) {
       console.log('Error in keep alive ws request. Reconnecting to node - app.js');
-      web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
+      web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
     }
 }, 300 * 1000);
 
