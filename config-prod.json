@@ -1,6 +1,6 @@
 {
-    "nodeAddr":     "ws://18.202.153.27",
-    "wsPort":       23000,
+    "nodeAddr":     "wss://wss.smilo.network",
+    "wsPort":       443,
     "startBlock":   0,
     "endBlock":     "latest",
     "quiet":        true,
