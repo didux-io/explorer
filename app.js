@@ -1,82 +1,44 @@
 #!/usr/bin/env node
 
 require( './db' );
-require( './db-stats' );
 
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const bodyParser = require('body-parser');
 
-var app = express();
+let config = {};
+try {
+  config = require('./config.json');
+} catch (e) {
+  if (e.code == 'MODULE_NOT_FOUND') {
+    console.log('No config file found. Using default configuration... (config.example.json)');
+    config = require('./config.example.json');
+  } else {
+    throw e;
+    process.exit(1);
+  }
+}
+
+const app = express();
 app.set('port', process.env.PORT || 3000);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(favicon(__dirname + '/public/favicon.png'));
+app.use(favicon(`${__dirname}/public/favicon.png`));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app libraries
-global.__lib = __dirname + '/lib/';
-
-let fs = require('fs');
-
-let config = {};
-
-try {
-    let configContents = fs.readFileSync('tools/config.json');
-    config = JSON.parse(configContents);
-}
-catch (error) {
-    if (error.code === 'ENOENT') {
-        console.log('No config file found. Using default configuration (will ' + 
-            'download all blocks starting from latest)');
-    }
-    else {
-        throw error;
-        process.exit(1);
-    }
-}
-
-// set the default geth address if it's not provided
-if (!('gethAddress' in config) || (typeof config.gethAddress) !== 'string') {
-    config.gethAddress = "localhost"; // default
-}
-
-// set the default geth port if it's not provided
-if (!('gethPort' in config) || (typeof config.gethPort) !== 'number') {
-    config.gethPort = 8545; // default
-}
-
-// set the default output directory if it's not provided
-if (!('output' in config) || (typeof config.output) !== 'string') {
-    config.output = '.'; // default this directory
-}
-
-// set the default blocks if it's not provided
-if (!('blocks' in config) || !(Array.isArray(config.blocks))) {
-    config.blocks = [];
-    config.blocks.push({'start': 0, 'end': 'latest'});
-}
-
 console.log('Using configuration:');
 console.log(config);
 
 let Web3 = require('web3');
-let web3 = new Web3(
-    new Web3.providers.HttpProvider(
-        'https://' + 
-        config.gethAddress.toString() + 
-        ':' + 
-        config.gethPort.toString()
-    )
-);
+let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
 
 let mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
@@ -85,27 +47,40 @@ let BlockStats = mongoose.model('BlockStat');
 let MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
 app.get("/stats", async function (req, res) {
-    let blockStats = await BlockStats.find({});
-    let totalAverageTime = 0;
-    let amountOfBlocksProcessed = 0;
-    blockStats.forEach(blockStat => {
-        totalAverageTime += blockStat.blockTime;
-        amountOfBlocksProcessed++;
-    });
-    let averageBlockTimeInSec = totalAverageTime / amountOfBlocksProcessed;
-    let latestBlock = await web3.eth.getBlock("latest").number;
-    let totalXsmCreated = getTotalXsmCreated(latestBlock);
+  let blockStats = await BlockStats.find({});
+  let totalAverageTime = 0;
+  let amountOfBlocksProcessed = 0;
+  blockStats.forEach(blockStat => {
+      totalAverageTime += blockStat.blockTime;
+      amountOfBlocksProcessed++;
+  });
+  let averageBlockTimeInSec = totalAverageTime / amountOfBlocksProcessed;
+  let latestBlockObj = await web3.eth.getBlock("latest");
+  let latestBlockNumber = latestBlockObj.number;
+  let totalXsmCreated = getTotalXsmCreated(latestBlockNumber);
 
-    let minedBlocksCountResult = await MinedBlocksCount.findOne({type: "global"});
+  let minedBlocksCountResult = await MinedBlocksCount.findOne({type: "global"});
 
-    res.send({
-        lastBlock: latestBlock,
-        totalXsm: totalXsmCreated,
-        totalTransactions: minedBlocksCountResult ? minedBlocksCountResult.amount : 0,
-        averageBlockTimeInSecLast1000Blocks: isNaN(averageBlockTimeInSec) ? "-1" : averageBlockTimeInSec.toFixed(2),
-        gasPrice: web3.eth.gasPrice
-    });
+  let gasPrice = await web3.eth.getGasPrice();
+
+  res.send({
+      lastBlock: latestBlockNumber,
+      current_supply: totalXsmCreated,
+      totalTransactions: minedBlocksCountResult ? minedBlocksCountResult.amount : 0,
+      averageBlockTimeInSecLast1000Blocks: isNaN(averageBlockTimeInSec) ? "-1" : averageBlockTimeInSec.toFixed(2),
+      gasPrice: gasPrice
+  });
 });
+
+var keepAlive = setInterval(async function() {
+    try {
+      console.log('Keep alive request - app.js');
+      console.log(await web3.eth.getNodeInfo());
+    } catch(error) {
+      console.log('Error in keep alive ws request. Reconnecting to node - app.js');
+      web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
+    }
+}, 300 * 1000);
 
 // https://github.com/Smilo-platform/Wiki/wiki/Masternode-block-reward
 function getTotalXsmCreated(totalBlocks) {
@@ -145,54 +120,50 @@ function getTotalXsmCreated(totalBlocks) {
     return totalXsmCreated.reward;
 }
 
+global.__lib = `${__dirname}/lib/`;
 
 // client
 
-app.get('/', function(req, res) {
-  res.render('index');
+app.get('/', (req, res) => {
+  res.render('index', config);
+});
+
+app.get('/config', (req, res) => {
+  res.json(config.settings);
 });
 
 require('./routes')(app);
 
 // let angular catch them
-app.use(function(req, res) {
-  res.render('index');
+app.use((req, res) => {
+  res.render('index', config);
 });
 
 // error handlers
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
+  app.use((err, req, res, next) => {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err,
     });
+  });
 }
-
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: {},
+  });
 });
 
-var http = require('http').Server(app);
-//var io = require('socket.io')(http);
+const http = require('http').Server(app);
 
-// web3socket(io);
-
-http.listen(app.get('port'), '0.0.0.0', function() {
-    console.log('Express server listening on port ' + app.get('port'));
-});
-
-
-process.on('SIGTERM', function() {
-    process.exit();
+http.listen(app.get('port'), '0.0.0.0', () => {
+  console.log(`Express server listening on port ${app.get('port')}`);
 });
