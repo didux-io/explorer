@@ -14,6 +14,7 @@ const Web3 = require('web3');
 const ERC20ABI = require('human-standard-token-abi');
 
 const fetch = require('node-fetch');
+const abiDecoder = require('abi-decoder');
 
 const mongoose = require('mongoose');
 const etherUnits = require('../lib/etherUnits.js');
@@ -21,12 +22,13 @@ const { Market } = require('../db.js');
 
 const Block = mongoose.model('Block');
 const Transaction = mongoose.model('Transaction');
+const InternalTransaction = mongoose.model('InternalTransaction');
 const Account = mongoose.model('Account');
 const Contract = mongoose.model('Contract');
 const TokenTransfer = mongoose.model('TokenTransfer');
 const MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
-const ERC20_METHOD_DIC = { '0xa9059cbb': 'transfer', '0xa978501e': 'transferFrom' };
+const ERC20_METHOD_DIC = { '0xa9059cbb': 'transfer', '0xa978501e': 'transferFrom', '0xad544c30': 'endRound' };
 
 /**
   Start config for node connection and sync
@@ -202,14 +204,18 @@ const writeTransactionsToDB = async (config, blockData, flush) => {
     self.miners.push({ address: blockData.miner, blockNumber: blockData.number, type: 0 });
   }
   if (blockData && blockData.transactions.length > 0) {
+    console.log('blockData:', blockData);
     for (d in blockData.transactions) {
+      console.log('d:', d);
       const txData = blockData.transactions[d];
       const receipt = await web3.eth.getTransactionReceipt(txData.hash);
       const tx = await normalizeTX(txData, receipt, blockData);
       // Contact creation tx, Event logs of internal transaction
       if (txData.input && txData.input.length > 2) {
+        console.log('writeTransactionsToDB HAS INPUT');
         // Contact creation tx
         if (txData.to === null) {
+          console.log('writeTransactionsToDB IF');
           // Support Parity & Geth case
           if (txData.creates) {
             contractAddress = txData.creates.toLowerCase();
@@ -259,39 +265,100 @@ const writeTransactionsToDB = async (config, blockData, flush) => {
             },
           );
         } else {
+          console.log('writeTransactionsToDB ELSE');
           // Internal transaction  . write to doc of InternalTx
           const transfer = {
             'hash': '', 'blockNumber': 0, 'from': '', 'to': '', 'contract': '', 'value': 0, 'timestamp': 0,
           };
           const methodCode = txData.input.substr(0, 10);
-          if (ERC20_METHOD_DIC[methodCode] === 'transfer' || ERC20_METHOD_DIC[methodCode] === 'transferFrom') {
+          console.log('methodCode:', methodCode);
+          console.log('txData.input:', txData.input);
+          if (ERC20_METHOD_DIC[methodCode] === 'transfer' || ERC20_METHOD_DIC[methodCode] === 'transferFrom' || ERC20_METHOD_DIC[methodCode] === 'endRound') {
             if (ERC20_METHOD_DIC[methodCode] === 'transfer') {
               // Token transfer transaction
               transfer.from = txData.from;
               transfer.to = `0x${txData.input.substring(34, 74)}`;
               transfer.value = Number(`0x${txData.input.substring(74)}`);
-            } else {
+              transfer.method = ERC20_METHOD_DIC[methodCode];
+              transfer.hash = txData.hash;
+              transfer.blockNumber = blockData.number;
+              transfer.contract = txData.to;
+              transfer.timestamp = blockData.timestamp;
+              // Write transfer transaction into db
+              TokenTransfer.update(
+                { hash: transfer.hash },
+                { $setOnInsert: transfer },
+                { upsert: true },
+                (err, data) => {
+                  if (err) {
+                    console.log(err);
+                  }
+                },
+              );
+            } else if (ERC20_METHOD_DIC[methodCode] === 'transferFrom') {
               // transferFrom
               transfer.from = `0x${txData.input.substring(34, 74)}`;
               transfer.to = `0x${txData.input.substring(74, 114)}`;
               transfer.value = Number(`0x${txData.input.substring(114)}`);
+              transfer.method = ERC20_METHOD_DIC[methodCode];
+              transfer.hash = txData.hash;
+              transfer.blockNumber = blockData.number;
+              transfer.contract = txData.to;
+              transfer.timestamp = blockData.timestamp;
+              // Write transfer transaction into db
+              TokenTransfer.update(
+                { hash: transfer.hash },
+                { $setOnInsert: transfer },
+                { upsert: true },
+                (err, data) => {
+                  if (err) {
+                    console.log(err);
+                  }
+                },
+              );
+            } else if (ERC20_METHOD_DIC[methodCode] === 'endRound') {
+              console.log('Quake txData:', txData);
+              console.log('Quake txData.input:', txData.input);
+              // Internal transaction; Quake endRound
+              const decodedData = abiDecoder.decodeMethod(txData.input);
+              const internalTransactionsAddresses = decodedData.params[0].value;
+              const internalTransactionsValues = decodedData.params[1].value;
+
+              console.log('internalTransactionsValues:', internalTransactionsValues);
+              console.log('internalTransactionsAddresses:', internalTransactionsAddresses);
+              for (let i = 0; i < internalTransactionsAddresses.length; i++) {
+                txData.value = etherUnits.toEther(new BigNumber(internalTransactionsValues[i]), 'wei');
+                console.log('txData.value:', txData.value);
+                txData.to = internalTransactionsAddresses[i];
+                txData.from = tx.to;
+                txData.method = ERC20_METHOD_DIC[methodCode];
+                txData.hash = txData.hash;
+                txData.blockNumber = blockData.number;
+                txData.contract = txData.to;
+                txData.timestamp = blockData.timestamp;
+                delete txData._id;
+                console.log('Adding internal transaction: ', txData);
+                // Add to internal transactions
+                InternalTransaction.collection.insert(txData, (err, tx) => {
+                  console.log('InternalTransaction.collection.insert err:', err);
+                  console.log('InternalTransaction.collection.insert tx:', tx);
+                  if (typeof err !== 'undefined' && err) {
+                    if (err.code === 11000) {
+                      if (!('quiet' in config && config.quiet === true)) {
+                        console.log(`Skip: Duplicate transaction key ${err}`);
+                      }
+                    } else {
+                      console.log(`Error: Aborted due to error on InternalTransaction: ${err}`);
+                      process.exit(9);
+                    }
+                  } else {
+                    if (!('quiet' in config && config.quiet === true)) {
+                      console.log(`* ${tx.insertedCount} internal transactions successfully recorded.`);
+                    }
+                  }
+                });
+              }
             }
-            transfer.method = ERC20_METHOD_DIC[methodCode];
-            transfer.hash = txData.hash;
-            transfer.blockNumber = blockData.number;
-            transfer.contract = txData.to;
-            transfer.timestamp = blockData.timestamp;
-            // Write transfer transaction into db
-            TokenTransfer.update(
-              { hash: transfer.hash },
-              { $setOnInsert: transfer },
-              { upsert: true },
-              (err, data) => {
-                if (err) {
-                  console.log(err);
-                }
-              },
-            );
           }
         }
       }
@@ -455,7 +522,7 @@ var syncChain = function (config, nextBlock) {
     } if (nextBlock < config.startBlock) {
       writeBlockToDB(config, null, true);
       writeTransactionsToDB(config, null, true);
-      console.log('*** Sync Finsihed ***');
+      console.log('*** Sync Finished ***');
       config.syncAll = false;
       return;
     }
@@ -494,14 +561,16 @@ const prepareSync = async (config, callback) => {
       if (web3.eth.net.isListening()) {
         const currentBlock = await web3.eth.getBlockNumber();
         const latestBlock = config.endBlock || currentBlock || 'latest';
+        console.log('config.endBlock:', config.endBlock);
         if (latestBlock === 'latest') {
+          console.log('End block is set to latest!');
           web3.eth.getBlock(latestBlock, true, (error, blockData) => {
             if (error) {
               console.log(`Warning (prepareSync): error on getting block with hash/number: ${latestBlock}: ${error}`);
             } else if (blockData === null) {
               console.log(`Warning: null block data received from the block with hash/number: ${latestBlock}`);
             } else {
-              console.log(`Starting block number = ${blockData.number}`);
+              console.log(`1. Starting block number = ${blockData.number}`);
               if ('quiet' in config && config.quiet === true) {
                 console.log('Quiet mode enabled');
               }
@@ -510,7 +579,7 @@ const prepareSync = async (config, callback) => {
             }
           });
         } else {
-          console.log(`Starting block number = ${latestBlock}`);
+          console.log(`2. Starting block number = ${latestBlock}`);
           if ('quiet' in config && config.quiet === true) {
             console.log('Quiet mode enabled');
           }
@@ -659,6 +728,30 @@ if (process.env.NORICHLIST) {
 // Start listening for latest blocks
 listenBlocks(config);
 
+// Two players
+const input = '0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c40000000000000000000000002ec3a912b3815c676064fb823bcf0c584809eda2000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000031f5c4ed27680000000000000000000000000000000000000000000000000000214e8348c4f00000';
+
+// Two players
+const input2 ='0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000020000000000000000000000002ec3a912b3815c676064fb823bcf0c584809eda2000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c4000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000031f5c4ed27680000000000000000000000000000000000000000000000000000214e8348c4f00000';
+
+// One player
+const input3 ='0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c4000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000053444835ec580000';
+
+// 0xad544c3
+// 000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000
+
+
+// Start at: 226
+// 577db2f2e42388109be8fb2048b2c339cb79a6c4
+// 000000000000000000000000
+// 2ec3a912b3815c676064fb823bcf0c584809eda2
+// 0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000
+
+
+// 31f5c4ed27680000
+// 000000000000000000000000000000000000000000000000
+// 214e8348c4f00000
+
 // Starts full sync when set to true in config
 if (config.syncAll === true) {
   console.log('Starting Full Sync');
@@ -683,3 +776,251 @@ var keepAlive = setInterval(async function() {
       web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort.toString()}`));
     }
 }, 300 * 1000);
+
+// const value = web3.utils.hexToNumber('0x31f5c4ed27680000');
+
+// const value = parseInt('0x31f5c4ed27680000', 16);
+
+const testData = '0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c40000000000000000000000002ec3a912b3815c676064fb823bcf0c584809eda2000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000031f5c4ed27680000000000000000000000000000000000000000000000000000214e8348c4f00000';
+
+const abi = [
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getGameDetails",
+		"outputs": [
+			{
+				"name": "",
+				"type": "string"
+			},
+			{
+				"name": "",
+				"type": "int256"
+			},
+			{
+				"name": "",
+				"type": "int256"
+			},
+			{
+				"name": "",
+				"type": "int256"
+			},
+			{
+				"name": "",
+				"type": "int256"
+			},
+			{
+				"name": "",
+				"type": "int256"
+			},
+			{
+				"name": "",
+				"type": "int256"
+			},
+			{
+				"name": "",
+				"type": "int256"
+			},
+			{
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "contractName",
+				"type": "string"
+			},
+			{
+				"name": "deposit",
+				"type": "int256"
+			},
+			{
+				"name": "minimalParticipants",
+				"type": "int256"
+			},
+			{
+				"name": "firstReward",
+				"type": "int256"
+			},
+			{
+				"name": "secondReward",
+				"type": "int256"
+			},
+			{
+				"name": "thirdReward",
+				"type": "int256"
+			},
+			{
+				"name": "serverReward",
+				"type": "int256"
+			},
+			{
+				"name": "rewardType",
+				"type": "string"
+			}
+		],
+		"name": "setGameDetails",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "winnersAddresses",
+				"type": "address[]"
+			},
+			{
+				"name": "winnersAmounts",
+				"type": "uint256[]"
+			}
+		],
+		"name": "endRound",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "participantAddress",
+				"type": "address"
+			}
+		],
+		"name": "isValidParticipant",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "participantAddress",
+				"type": "address"
+			}
+		],
+		"name": "addParticipant",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "amountOfParticipants",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"name": "contractName",
+				"type": "string"
+			},
+			{
+				"name": "deposit",
+				"type": "int256"
+			},
+			{
+				"name": "minimalParticipants",
+				"type": "int256"
+			},
+			{
+				"name": "firstReward",
+				"type": "int256"
+			},
+			{
+				"name": "secondReward",
+				"type": "int256"
+			},
+			{
+				"name": "thirdReward",
+				"type": "int256"
+			},
+			{
+				"name": "serverReward",
+				"type": "int256"
+			},
+			{
+				"name": "rewardType",
+				"type": "string"
+			}
+		],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "constructor"
+	},
+	{
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "fallback"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "winnersAddresses",
+				"type": "address[]"
+			},
+			{
+				"indexed": false,
+				"name": "winnersAmounts",
+				"type": "uint256[]"
+			}
+		],
+		"name": "WinnersSummary",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "ContractReceivedFunds",
+		"type": "event"
+	}
+];
+abiDecoder.addABI(abi);
+
+// const decodedData = abiDecoder.decodeMethod(testData);
+
+// const winnersAddresses = decodedData.params[0].value;
+// const winnersAmounts = decodedData.params[1].value;
+
+// console.log('winnersAddresses:', winnersAddresses);
+// console.log('winnersAmounts:', winnersAmounts);
