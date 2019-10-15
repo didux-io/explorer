@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const Block = mongoose.model('Block');
 const Transaction = mongoose.model('Transaction');
+const InternalTransaction = mongoose.model('InternalTransaction');
 const Account = mongoose.model('Account');
 const MinedBlocksCount = mongoose.model('MinedBlocksCount');
 const Contract = mongoose.model('Contract');
@@ -25,7 +26,10 @@ module.exports = function (app) {
   */
   app.post('/richlist', richList);
   app.post('/addr', getAddr);
+  app.post('/internal_addr', getInternalAddr);
   app.post('/addr_count', getAddrCounter);
+  app.post('/internal_addr_count', getInternalAddrCounter);
+  app.post('/internal_addr_on_blockhash', getInternalAddrOnBlockHash);
   app.post('/tx', getTx);
   app.post('/block', getBlock);
   app.post('/data', getData);
@@ -74,6 +78,48 @@ const getAddr = async (req, res) => {
     });
 
 };
+const getInternalAddr = async (req, res) => {
+  // TODO: validate addr and tx
+  const addr = req.body.addr.toLowerCase();
+  const count = parseInt(req.body.count);
+
+  const limit = parseInt(req.body.length);
+  const start = parseInt(req.body.start);
+
+  const data = {
+    draw: parseInt(req.body.draw), recordsFiltered: count, recordsTotal: count, mined: 0,
+  };
+
+  const addrFind = InternalTransaction.find({ $or: [{ 'to': addr }, { 'from': addr }] });
+
+  let sortOrder = '-blockNumber';
+  if (req.body.order && req.body.order[0] && req.body.order[0].column) {
+    // date or blockNumber column
+    if (req.body.order[0].column == 1 || req.body.order[0].column == 6) {
+      if (req.body.order[0].dir == 'asc') {
+        sortOrder = 'blockNumber';
+      }
+    }
+  }
+
+  addrFind.lean(true).sort(sortOrder).skip(start).limit(limit)
+    .exec('find', (err, docs) => {
+      if (docs) data.data = filters.filterTX(docs, addr);
+      else data.data = [];
+      res.write(JSON.stringify(data));
+      res.end();
+    });
+
+};
+const getInternalAddrOnBlockHash = async (req, res) => {
+  console.log('getInternalAddrOnBlockHash');
+  const blockHash = req.body.blockHash;
+  console.log('get hash on:', blockHash);
+
+  const addrFind = await InternalTransaction.find({ 'blockHash': blockHash });
+  console.log('addrFind:', addrFind);
+  res.send(addrFind);
+};
 var getAddrCounter = function (req, res) {
   const addr = req.body.addr.toLowerCase();
   const count = parseInt(req.body.count);
@@ -104,7 +150,28 @@ var getAddrCounter = function (req, res) {
     res.write(JSON.stringify(data));
     res.end();
   });
+};
+var getInternalAddrCounter = function (req, res) {
+  const addr = req.body.addr.toLowerCase();
+  console.log('getInternalAddrCounter:', addr);
+  const count = parseInt(req.body.count);
+  const data = { recordsTotal: count, recordsTotal: count, mined: 0 };
 
+  async.waterfall([
+    function (callback) {
+      InternalTransaction.count({ $or: [{ 'to': addr }, { 'from': addr }] }, (err, count) => {
+        if (!err && count) {
+          // fix recordsTotal
+          data.recordsTotal = count;
+          console.log('data.recordsInternalTotal:', data.recordsTotal);
+          data.recordsFiltered = count;
+        }
+        callback(null);
+      });
+    }], (err) => {
+    res.write(JSON.stringify(data));
+    res.end();
+  });
 };
 var getMinedBlockCount = async function(req, res) {
   console.log('getMinedBlockCount');

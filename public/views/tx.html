@@ -38,6 +38,23 @@
           <td>
             <span ng-hide="tx.tokenTo"><a href="/addr/{{tx.to}}">{{tx.to}}</a></span>
             <span ng-show="tx.tokenTo"><a href="/addr/{{tx.tokenTo}}">{{tx.tokenTo}}</a></span>
+            <div ng-show="tx.internalTxs.length > 0" class="internal_full_box">
+                <div ng-repeat="itx in tx.internalTxs track by $index" 
+                     class="internal_full_repeat_box"
+                     ng-class="{internal_border_left: $index !== (tx.internalTxs.length - 1)}">
+                    <div class="internal_bottom_border_main_divider">
+                        <div class="internal_divider_border" 
+                             ng-class="{internal_border_left: $index === (tx.internalTxs.length - 1)}">
+                            
+                        </div>
+                        <div>
+
+                        </div>
+                    </div>
+                    <div ng-hide="itx.tokenTo" class="internal-address"><a href="/addr/{{itx.to}}">{{itx.to}}</a>&nbsp;&nbsp;</div>
+                    <div class="internal_value">{{itx.value}} XSM</div>
+                </div>
+            </div>
           </td>
         </tr>
         <tr ng-show="tx.creates">

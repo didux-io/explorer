@@ -1,4 +1,6 @@
-FROM node:latest
+FROM node:8
+
+#RUN apt update && apt install -y build-essential g++ tar gyp
 
 WORKDIR /app
 COPY package-lock.json /app/

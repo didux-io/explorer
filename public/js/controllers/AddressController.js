@@ -1,3 +1,5 @@
+
+
 angular.module('BlocksApp').controller('AddressController', function($stateParams, $rootScope, $scope, $http, $location) {
     $scope.$on('$viewContentLoaded', function() {   
         // initialize core components
@@ -53,7 +55,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           "lengthMenu": "_MENU_ Show Mined Blocks Per Page",
           "zeroRecords": "No mined blocks found",
           "infoEmpty": "",
-          "infoFiltered": "(filtered from _MAX_ total txs)"
+          "infoFiltered": "(filtered from _MAX_ total mtxs)"
         },
         "columnDefs": [ 
           { "render": function(data, type, row) {
@@ -98,6 +100,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
         ajax: function(data, callback, settings) {
           data.addr = $scope.addrHash;
           data.count = $scope.addr.count;
+          console.log('/addr:', data);
           $http.post('/addr', data).then(function(resp) {
             // save data
             $scope.data = resp.data;
@@ -166,12 +169,80 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
     }
 
     var fetchInternalTxs = function() {
-      $http({
-        method: 'POST',
-        url: '/web3relay',
-        data: {"addr_trace": $scope.addrHash}
-      }).then(function(resp) {
-        $scope.internal_transactions = resp.data;
+      console.log('fetchInternalTxs:', $scope.addrHash);
+      var table = $("#table_internal_txs").DataTable({
+        processing: true,
+        serverSide: true,
+        searching: false,
+        paging: true,
+        ajax: function(data, callback, settings) {
+          data.addr = $scope.addrHash;
+          data.count = $scope.addr.count;
+          $http.post('/internal_addr', data).then(function(resp) {
+            // save data
+            $scope.data = resp.data;
+            // check $scope.records* if available.
+            resp.data.recordsTotal = $scope.recordsTotal ? $scope.recordsTotal : resp.data.recordsTotal;
+            resp.data.recordsFiltered = $scope.recordsFiltered ? $scope.recordsFiltered : resp.data.recordsFiltered;
+            callback(resp.data);
+          });
+
+          // get mined, recordsTotal counter only once.
+          if (data.draw > 1)
+            return;
+
+          $http.post('/internal_addr_count', data).then(function(resp) {
+            $scope.addr.internalCount = resp.data.recordsTotal;
+
+            console.log('Internal count:', resp);
+
+            data.count = resp.data.recordsTotal;
+
+            // set $scope.records*
+            $scope.recordsTotal = resp.data.recordsTotal;
+            $scope.recordsFiltered = resp.data.recordsFiltered;
+            // draw table if $scope.data available.
+            if ($scope.data) {
+              $scope.data.recordsTotal = resp.data.recordsTotal;
+              $scope.data.recordsFiltered = resp.data.recordsFiltered;
+              callback($scope.data);
+            }
+          });
+        },
+        "lengthMenu": [
+                    [10, 20, 50, 100, 150, 500],
+                    [10, 20, 50, 100, 150, 500] // change per page values here
+                ],
+        "pageLength": 20,
+        "order": [
+            [6, "desc"]
+        ],
+        "language": {
+          "lengthMenu": "_MENU_ Show Internal Transactions Per Page",
+          "zeroRecords": "No internal transactions found",
+          "infoEmpty": "",
+          "infoFiltered": "(filtered from _MAX_ total itxs)"
+        },
+        "columnDefs": [
+          { "targets": [ 5 ], "visible": false, "searchable": false },
+          {"type": "date", "targets": 6},
+          {"orderable": false, "targets": [0,2,3,4]},
+          { "render": function(data, type, row) {
+                        return '<a href="/addr/'+data+'">'+data+'</a>'
+                      }, "targets": [2,3]},
+          { "render": function(data, type, row) {
+                        return '<a href="/block/'+data+'">'+data+'</a>'
+                      }, "targets": [1]},
+          { "render": function(data, type, row) {
+                        return '<a href="/tx/'+data+'">'+data+'</a>'
+                      }, "targets": [0]},
+          { "render": function(data, type, row) {
+                        return getDuration(data).toString();
+                      }, "targets": [6]},
+          { "render": function(data, type, row) {
+                    return data+' XSM'.toString();
+                }, "targets": [4]},
+          ]
       });
     }
 
@@ -184,7 +255,6 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
       fetchTxs();
       if (resp.data.isContract) {
         $rootScope.$state.current.data["pageTitle"] = "Contract Address";
-        // fetchInternalTxs();
         $http({
           method: 'GET',
           url: '/contractdetails?addr=' + $scope.addrHash,
@@ -192,7 +262,10 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           $scope.addr.owner = data.data.owner;
           $scope.addr.creationTransaction = data.data.creationTransaction;
         });
+      } else {
+        $rootScope.$state.current.data["pageTitle"] = "Address";
       }
+      fetchInternalTxs();
       $http({
         method: 'GET',
         url: '/minedblockcount?addr=' + $scope.addrHash,
