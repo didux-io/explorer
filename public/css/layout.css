@@ -8,6 +8,40 @@
     text-align: center;
 }
 
+.internal_full_repeat_box {
+    display: flex;
+    flex-direction: row;
+}
+
+.internal_full_box {
+    padding-left: 12px;
+}
+
+.internal-address {
+    width: 380px;
+}
+
+.internal_value {
+    color: green;
+}
+
+.internal_border_left {
+    border-left: 1px solid black;
+}
+
+.internal_divider_border {
+    height: 11px;
+    border-bottom: 1px solid black;
+    margin-right: 3px;
+}
+
+.internal_bottom_border_main_divider {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
 .left { float: left; }
 .right { float: right; }
 

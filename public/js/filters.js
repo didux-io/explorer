@@ -26,14 +26,26 @@ var getDifficulty = function(hashes) {
     unit = 'G';
   }
 
-  if(hashes >= Math.pow(1000, 4) ) {
+  if(hashes >= Math.pow(1000, 4) && hashes < Math.pow(1000, 5)) {
     result = hashes / Math.pow(1000, 4);
     unit = 'T';
   }
-  
-  result = Number(result);
 
-  return result.toFixed(2) + ' ' + unit + 'H';
+  if(hashes >= Math.pow(1000, 5) && hashes < Math.pow(1000, 6)) {
+    result = hashes / Math.pow(1000, 5);
+    unit = 'P';
+  }
+
+  if(hashes >= Math.pow(1000, 6) && hashes < Math.pow(1000, 7)) {
+    result = hashes / Math.pow(1000, 6);
+    unit = 'E';
+  }
+
+  if(hashes >= Math.pow(1000, 7) ) {
+    result = hashes / Math.pow(1000, 7);
+    unit = 'Z';
+  }
+  return Number(result).toFixed(2) + ' ' + unit + 'H';
 }
 
 /*

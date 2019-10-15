@@ -38,8 +38,6 @@ jspm_packages
 
 # local data
 data/
-
-.DS_Store
-.node*
-/config.json
+.node-xmlhttprequest-*
+/nbproject/private/
 .idea
