@@ -217,3 +217,7 @@ li.ng-scope {
 .mini-logo {
   height: 1.2em;
 }
+
+tr {
+    word-break: break-all;
+}

@@ -1,7 +1,7 @@
 {
-    "nodeAddr":     "wss://testnet-wallet.smilo.network/ws",
+    "nodeAddr":     "wss://ws.mainnet.smilo.network",
     "wsPort":       443,
-    "startBlock":   0,
+    "startBlock":   "latest",
     "endBlock":     "latest",
     "quiet":        true,
     "syncAll":      true,

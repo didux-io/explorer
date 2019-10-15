@@ -75,6 +75,27 @@ const Transaction = new Schema(
   }, { collection: 'Transaction' },
 );
 
+const InternalTransaction = new Schema(
+  {
+    'hash': { type: String, lowercase: true },
+    'nonce': Number,
+    'blockHash': String,
+    'blockNumber': Number,
+    'transactionIndex': Number,
+    'method': String,
+    'status': Number,
+    'from': { type: String, lowercase: true },
+    'to': { type: String, lowercase: true },
+    'creates': { type: String, lowercase: true },
+    'value': String,
+    'gas': Number,
+    'gasUsed': Number,
+    'gasPrice': String,
+    'timestamp': Number,
+    'input': String,
+  }, { collection: 'InternalTransaction' },
+);
+
 var MinedBlocksCount = new Schema(
   {
     "type": String,
@@ -125,6 +146,10 @@ Transaction.index({ blockNumber: -1 });
 Transaction.index({ from: 1, blockNumber: -1 });
 Transaction.index({ to: 1, blockNumber: -1 });
 Transaction.index({ creates: 1, blockNumber: -1 });
+InternalTransaction.index({ blockNumber: -1 });
+InternalTransaction.index({ from: 1, blockNumber: -1 });
+InternalTransaction.index({ to: 1, blockNumber: -1 });
+InternalTransaction.index({ creates: 1, blockNumber: -1 });
 Account.index({ balance: -1 });
 Account.index({ balance: -1, blockNumber: -1 });
 Account.index({ type: -1, balance: -1 });
@@ -142,13 +167,14 @@ mongoose.model('Block', Block);
 mongoose.model('Account', Account);
 mongoose.model('Contract', Contract);
 mongoose.model('Transaction', Transaction);
+mongoose.model('InternalTransaction', InternalTransaction);
 mongoose.model('Market', Market);
 mongoose.model('TokenTransfer', TokenTransfer);
 mongoose.model('MinedBlocksCount', MinedBlocksCount);
 module.exports.BlockStat = mongoose.model('BlockStat');
 module.exports.Block = mongoose.model('Block');
 module.exports.Contract = mongoose.model('Contract');
-module.exports.Transaction = mongoose.model('Transaction');
+module.exports.InternalTransaction = mongoose.model('InternalTransaction');
 module.exports.Account = mongoose.model('Account');
 module.exports.Market = mongoose.model('Market');
 module.exports.TokenTransfer = mongoose.model('TokenTransfer');
