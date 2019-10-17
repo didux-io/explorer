@@ -65,7 +65,8 @@
           </div>
           <div class="todo-tasklist-controls">
             <span class="todo-tasklist-item-text">From <a href="/addr/{{t.from}}">{{t.from.substr(0,24)}}...</a></span>
-            <span class="todo-tasklist-item-text">To <a href="/addr/{{t.to}}">{{t.to.substr(0,24)}}...</a></span><br>
+            <span ng-show="t.to" class="todo-tasklist-item-text">To <a href="/addr/{{t.to}}">{{t.to.substr(0,24)}}...</a></span>
+            <span ng-show="t.creates" class="todo-tasklist-item-text">Creates <a href="/addr/{{t.creates}}">{{t.creates.substr(0,24)}}...</a></span><br>
             <div class="todo-tasklist-item-text" style="margin-top:4px;">{{t.value}} {{settings.symbol}}</div>
           </div>
         </div>

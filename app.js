@@ -42,7 +42,6 @@ let web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAdd
 
 let mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
-let Transaction = mongoose.model('Transaction');
 let BlockStats = mongoose.model('BlockStat');
 let MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
