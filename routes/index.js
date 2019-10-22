@@ -127,7 +127,6 @@ var getAddrCounter = function (req, res) {
 
   async.waterfall([
     function (callback) {
-
       Transaction.count({ $or: [{ 'to': addr }, { 'from': addr }] }, (err, count) => {
         if (!err && count) {
           // fix recordsTotal
@@ -136,9 +135,7 @@ var getAddrCounter = function (req, res) {
         }
         callback(null);
       });
-
     }, function (callback) {
-
       Block.count({ 'miner': addr }, (err, count) => {
         if (!err && count) {
           data.mined = count;
@@ -147,8 +144,8 @@ var getAddrCounter = function (req, res) {
       });
 
     }], (err) => {
-    res.write(JSON.stringify(data));
-    res.end();
+      res.write(JSON.stringify(data));
+      res.end();
   });
 };
 var getInternalAddrCounter = function (req, res) {
@@ -163,14 +160,16 @@ var getInternalAddrCounter = function (req, res) {
         if (!err && count) {
           // fix recordsTotal
           data.recordsTotal = count;
-          console.log('data.recordsInternalTotal:', data.recordsTotal);
           data.recordsFiltered = count;
+        } else {
+          data.recordsTotal = 0;
+          data.recordsFiltered = 0;
         }
         callback(null);
       });
     }], (err) => {
-    res.write(JSON.stringify(data));
-    res.end();
+      res.write(JSON.stringify(data));
+      res.end();
   });
 };
 var getMinedBlockCount = async function(req, res) {
@@ -208,22 +207,28 @@ var getMinedBlocks = async function(req, res) {
 
   var data = { draw: parseInt(req.body.draw), recordsFiltered: count, recordsTotal: count };
 
-  let minedBlocks = Block.find({miner: addr});
+  console.log('getMinedBlocks start query');
+  let minedBlocks = Block.find({miner: addr})
+  // .sort({timestamp: -1});
+  console.log('getMinedBlocks end query');
 
   var limit = parseInt(req.body.length);
   var start = parseInt(req.body.start);
 
-  console.log('getMinedBlocks LEAN EXECUTE');
-  minedBlocks.lean(true).skip(start).limit(limit).sort({timestamp: -1})
-            .exec("find", function (err, docs) {
-              // console.log('Docs:', docs);
-              if (docs)
-                data.data = filters.filterMinedBlock(docs, addr);      
-              else 
-                data.data = [];
-              console.log('getMinedBlocks found:', data);
-              res.write(JSON.stringify(data));
-              res.end();
+  console.log('getMinedBlocks start lean');
+  minedBlocks.lean(true)
+              .skip(start)
+              .limit(limit)
+              .sort({timestamp: -1})
+              .exec("find", function (err, docs) {
+                if (docs)
+                  data.data = filters.filterMinedBlock(docs, addr);      
+                else 
+                  data.data = [];
+                
+                console.log('getMinedBlocks end lean');
+                res.write(JSON.stringify(data));
+                res.end();
             });
 };
 var getBlock = function (req, res) {

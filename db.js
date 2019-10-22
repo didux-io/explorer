@@ -154,6 +154,7 @@ Account.index({ balance: -1 });
 Account.index({ balance: -1, blockNumber: -1 });
 Account.index({ type: -1, balance: -1 });
 Block.index({ miner: 1 });
+Block.index({ timestamp: 1 });
 Block.index({ miner: 1, blockNumber: -1 });
 Block.index({ hash: 1, number: -1 });
 Market.index({ timestamp: -1 });
