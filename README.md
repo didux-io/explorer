@@ -1,16 +1,16 @@
 # Didux Explorer
 
-<img src="public/img/explorer-logo.png" alt="ETC Explorer logo" height="200" />
+<img src="public/img/didux-logo.png" alt="Didux Explorer logo" height="200" />
 
-<b>Live Version: [etherhub.io](http://etherhub.io)</b>
+<b>Live Version: [didux.io](https://explorer.didux.network/)</b>
 
-Follow the project progress at: [ETC Block Explorer Development](https://github.com/ethereumclassic/explorer)
+Follow the project progress at: [Didux Block Explorer Development](https://github.com/didux-io/Didux-Explorer)
 
 ## Local installation
 
 Clone the repo
 
-`git clone https://github.com/ethereumclassic/explorer`
+`git clone https://github.com/didux-io/Didux-Explorer`
 
 Download [Nodejs and npm](https://docs.npmjs.com/getting-started/installing-node "Nodejs install") if you don't have them
 
@@ -45,20 +45,18 @@ Basic settings:
     "patchBlocks":  100,
     "bulkSize":     100,
     "settings": {
-        "symbol": "ETC",
-        "name": "Ethereum Classic",
-        "title": "Ethereum Classic Block Explorer",
+        "symbol": "XD",
+        "name": "Didux.io",
+        "title": "Didux.io Block Explorer",
         "author": "Elaine",
-        "rss": "https://ethereumclassic.org",
-        "reddit": "https://www.reddit.com/r/EthereumClassic",
-        "twitter": "https://twitter.com/eth_classic",
-        "linkedin": "https://www.linkedin.com/company/ethereum-classic",
-        "github": "https://github.com/ethereumclassic",
+        "rss": "https://didux.io",
+        "reddit": "https://www.reddit.com/r/didux.io",
+        "twitter": "https://twitter.com/didux.io",
+        "linkedin": "https://www.linkedin.com/company/didux.io",
+        "github": "https://github.com/didux.io",
         "logo": "/img/explorer-logo.png",
-        "copyright": "2019 &copy; Ethereum Classic.",
+        "copyright": "2019 &copy; Didux.io.",
         "poweredbyCustom": false,
-        "poweredbyEtcImage": "/img/powered-by-etcexplorer-w.png",
-        "poweredbyEtc": true,
         "useRichList": true,
         "useFiat": true,
         "miners": {
