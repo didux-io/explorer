@@ -7,12 +7,13 @@ const _ = require('lodash');
 const Web3 = require('web3');
 const web3explorer = require('web3-explorer');
 const asyncL = require('async');
-const BigNumber = require('bignumber.js');
+// const BigNumber = require('bignumber.js');
 const mongoose = require('mongoose');
 
-const { Account } = require('../db.js');
-const { Transaction } = require('../db.js');
-const { Block } = require('../db.js');
+const Account = mongoose.model('Account');
+const Transaction = mongoose.model('Transaction');
+const Block = mongoose.model('Block');
+console.log('Start Transaction:', Transaction);
 
 const ADDRESS_CACHE_MAX = 10000; // address cache threshold
 
@@ -67,6 +68,7 @@ function makeRichList(toBlock, blocks, updateCallback) {
       // Transaction.distinct("from", { blockNumber: { $lte: toBlock, $gt: fromBlock } }, function(err, docs) ...
       // faster
       // dictint("from")
+      console.log('Transaction aggregate:', Transaction);
       Transaction.aggregate([
         { $match: { blockNumber: { $lte: toBlock, $gt: fromBlock } } },
         { $group: { _id: '$from' } },

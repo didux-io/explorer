@@ -14,8 +14,8 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
 
       if (tabId === 4) {
         fetchMinedBlocks($scope.addr.minedBlockCount);
-        
       }
+      event.preventDefault();
     }
 
     var activeTab = $location.url().split('#');
@@ -103,7 +103,9 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           console.log('/addr:', data);
           $http.post('/addr', data).then(function(resp) {
             // save data
-            $scope.data = resp.data;
+            $scope.internalTxData = resp.data;
+
+            console.log('Transactions:', resp.data);
             // check $scope.records* if available.
             resp.data.recordsTotal = $scope.recordsTotal ? $scope.recordsTotal : resp.data.recordsTotal;
             resp.data.recordsFiltered = $scope.recordsFiltered ? $scope.recordsFiltered : resp.data.recordsFiltered;
@@ -123,11 +125,11 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
             // set $scope.records*
             $scope.recordsTotal = resp.data.recordsTotal;
             $scope.recordsFiltered = resp.data.recordsFiltered;
-            // draw table if $scope.data available.
-            if ($scope.data) {
-              $scope.data.recordsTotal = resp.data.recordsTotal;
-              $scope.data.recordsFiltered = resp.data.recordsFiltered;
-              callback($scope.data);
+            // draw table if $scope.internalTxData available.
+            if ($scope.internalTxData) {
+              $scope.internalTxData.recordsTotal = resp.data.recordsTotal;
+              $scope.internalTxData.recordsFiltered = resp.data.recordsFiltered;
+              callback($scope.internalTxData);
             }
           });
         },
@@ -180,7 +182,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           data.count = $scope.addr.count;
           $http.post('/internal_addr', data).then(function(resp) {
             // save data
-            $scope.data = resp.data;
+            $scope.normalTxData = resp.data;
             // check $scope.records* if available.
             resp.data.recordsTotal = $scope.recordsTotal ? $scope.recordsTotal : resp.data.recordsTotal;
             resp.data.recordsFiltered = $scope.recordsFiltered ? $scope.recordsFiltered : resp.data.recordsFiltered;
@@ -194,18 +196,16 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           $http.post('/internal_addr_count', data).then(function(resp) {
             $scope.addr.internalCount = resp.data.recordsTotal;
 
-            console.log('Internal count:', resp);
-
             data.count = resp.data.recordsTotal;
 
             // set $scope.records*
             $scope.recordsTotal = resp.data.recordsTotal;
             $scope.recordsFiltered = resp.data.recordsFiltered;
-            // draw table if $scope.data available.
-            if ($scope.data) {
-              $scope.data.recordsTotal = resp.data.recordsTotal;
-              $scope.data.recordsFiltered = resp.data.recordsFiltered;
-              callback($scope.data);
+            // draw table if $scope.normalTxData available.
+            if ($scope.normalTxData) {
+              $scope.normalTxData.recordsTotal = resp.data.recordsTotal;
+              $scope.normalTxData.recordsFiltered = resp.data.recordsFiltered;
+              callback($scope.normalTxData);
             }
           });
         },

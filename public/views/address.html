@@ -17,13 +17,13 @@
               <span class="fade">{{ addr.balanceUSD | currency : "$" : 4 }}</span> <span class="eth-stat-text fade">USD balance</span>
             </div> -->
             <div class="margin-top-20">
-              {{ addr.minedBlockCount }} <span class="eth-stat-text">Mined Blocks</span>
-            </div>
-            <div class="margin-top-20">
               {{ addr.count }} <span class="eth-stat-text">Transactions</span>
             </div>
             <div class="margin-top-20">
               {{ addr.internalCount }} <span class="eth-stat-text">Internal Transactions</span>
+            </div>
+            <div class="margin-top-20">
+              {{ addr.minedBlockCount }} <span class="eth-stat-text">Mined Blocks</span>
             </div>
           </div>
         </div>
@@ -50,16 +50,16 @@
       <div class="tabbable-line">
         <ul class="nav nav-tabs ">
           <li ng-class="{active: activeTab == 'tab_addr_1' || !activeTab}" ng-click="changeActiveTab(1);">
-            <a href="#tab_addr_1" data-toggle="tab" aria-expanded="true"> Transactions </a>
+            <a href="#tab_addr_1" data-toggle="tab" aria-expanded="true">Transactions </a>
           </li>
           <li  ng-class="{active: activeTab == 'tab_addr_2'}" ng-click="changeActiveTab(2);">
-            <a href="#tab_addr_2" data-toggle="tab" aria-expanded="false"> Internal Transactions </a>
+            <a href="#tab_addr_2" data-toggle="tab" aria-expanded="false">Internal Transactions </a>
           </li>
           <li class="" ng-show="addr.isContract" ng-class="{active: activeTab == 'tab_addr_3'}" ng-click="changeActiveTab(3);">
-            <a href="#tab_addr_3" data-toggle="tab" aria-expanded="false"> Contract Source </a>
+            <a href="#tab_addr_3" data-toggle="tab" aria-expanded="false">Contract Source </a>
           </li>
           <li ng-class="{active: activeTab == 'tab_addr_4' || !activeTab}" ng-click="changeActiveTab(4);">
-              <a href="#tab_addr_4" data-toggle="tab" aria-expanded="false"> Mined Blocks </a>
+              <a href="#tab_addr_4" data-toggle="tab" aria-expanded="false">Mined Blocks </a>
           </li>
         </ul>
         <div class="tab-content">
