@@ -18,6 +18,8 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
       event.preventDefault();
     }
 
+    const web3 = new Web3();
+
     var activeTab = $location.url().split('#');
     if (activeTab.length > 1) {
       $scope.activeTab = activeTab[1]; 
@@ -25,7 +27,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
       $scope.activeTab = 'tab_addr_1';
     }
 
-    $rootScope.$state.current.data["pageSubTitle"] = $stateParams.hash;
+    $rootScope.$state.current.data["pageSubTitle"] = web3.toChecksumAddress($stateParams.hash);
     $scope.addrHash = $stateParams.hash;
     $scope.addr = {"balance": 0, "count": 0, "mined": 0};
     $scope.settings = $rootScope.setup;
@@ -100,12 +102,9 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
         ajax: function(data, callback, settings) {
           data.addr = $scope.addrHash;
           data.count = $scope.addr.count;
-          console.log('/addr:', data);
           $http.post('/addr', data).then(function(resp) {
             // save data
             $scope.internalTxData = resp.data;
-
-            console.log('Transactions:', resp.data);
             // check $scope.records* if available.
             resp.data.recordsTotal = $scope.recordsTotal ? $scope.recordsTotal : resp.data.recordsTotal;
             resp.data.recordsFiltered = $scope.recordsFiltered ? $scope.recordsFiltered : resp.data.recordsFiltered;
@@ -152,13 +151,17 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           {"type": "date", "targets": 6},
           {"orderable": false, "targets": [0,2,3,4]},
           { "render": function(data, type, row) {
-                        return '<a href="/addr/'+data+'">'+data+'</a>'
+                        let checkSumCheckedAddress = data;
+                        if (data !== null) {
+                          checkSumCheckedAddress = web3.toChecksumAddress(data);
+                        }
+                        return '<a href="/addr/'+data+'">'+checkSumCheckedAddress+'</a>'
                       }, "targets": [2,3]},
           { "render": function(data, type, row) {
                         return '<a href="/block/'+data+'">'+data+'</a>'
                       }, "targets": [1]},
           { "render": function(data, type, row) {
-                        return '<a href="/tx/'+data+'">'+data+'</a>'
+                        return '<a href="/tx/'+data+'">'+web3.toChecksumAddress(data)+'</a>'
                       }, "targets": [0]},
           { "render": function(data, type, row) {
                         return getDuration(data).toString();
@@ -171,7 +174,6 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
     }
 
     var fetchInternalTxs = function() {
-      console.log('fetchInternalTxs:', $scope.addrHash);
       var table = $("#table_internal_txs").DataTable({
         processing: true,
         serverSide: true,
@@ -228,13 +230,17 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           {"type": "date", "targets": 6},
           {"orderable": false, "targets": [0,2,3,4]},
           { "render": function(data, type, row) {
-                        return '<a href="/addr/'+data+'">'+data+'</a>'
+                        let checkSumCheckedAddress = data;
+                        if (data !== null) {
+                          checkSumCheckedAddress = web3.toChecksumAddress(data);
+                        }
+                        return '<a href="/addr/'+data+'">'+checkSumCheckedAddress+'</a>'
                       }, "targets": [2,3]},
           { "render": function(data, type, row) {
                         return '<a href="/block/'+data+'">'+data+'</a>'
                       }, "targets": [1]},
           { "render": function(data, type, row) {
-                        return '<a href="/tx/'+data+'">'+data+'</a>'
+                        return '<a href="/tx/'+data+'">'+web3.toChecksumAddress(data)+'</a>'
                       }, "targets": [0]},
           { "render": function(data, type, row) {
                         return getDuration(data).toString();

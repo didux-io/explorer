@@ -52,15 +52,15 @@ var getDifficulty = function(hashes) {
   Convert unix timestamp to something that doesn't suck
 */
 var getDuration = function(timestamp){
-    var millis = Date.now() - timestamp*1000;
+    var millis = Date.now() - timestamp * 1000;
     var dur = [];
     var units = [
         {label:"millis",    mod:1000},
         {label:"seconds",   mod:60},
-        {label:"mins",   mod:60},
+        {label:"mins",      mod:60},
         {label:"hours",     mod:24},
         {label:"days",      mod:365},
-        {label:"years",      mod:1000}
+        {label:"years",     mod:1000}
     ];
     // calculate the individual unit values
     units.forEach(function(u){
@@ -70,7 +70,11 @@ var getDuration = function(timestamp){
             return;
         if (val > 0)
             dur.push({"label": u.label, "val": val});
+        
     });
+    if (dur.length === 0) {
+      dur = [{ label: "seconds", val: 0}];
+    }
     // convert object to string representation
     dur.toString = function(){
         return dur.reverse().slice(0,2).map(function(d){

@@ -1,5 +1,5 @@
 {
-    "nodeAddr":     "wss://ws.mainnet.smilo.network",
+    "nodeAddr":     "ws.mainnet.smilo.network",
     "wsPort":       443,
     "startBlock":   "latest",
     "endBlock":     "latest",
@@ -25,7 +25,7 @@
         "poweredbyEtcImage": "/img/powered-by-etcexplorer-w.png",
         "poweredbyEtc": false,
         "tokenList": "tokens.json",
-        "useRichList": false,
+        "useRichList": true,
         "useFiat": false,
         "miners": {
             "0x18376081F21B97e7E6678a9e82B8d45928509f57": "Didux.io Foundation",

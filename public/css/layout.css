@@ -1993,4 +1993,12 @@ a:hover {
 .page-spinner-bar img {
     width: 100px;
     margin-left: 40px;
+} 
+
+.navbar-nav > li.active > a {
+    border-bottom: 4px solid #f4623a !important;
+}
+
+.page-header .page-header-menu .hor-menu.hor-menu-light .navbar-nav>li>a:hover {
+    border-bottom: 4px solid #f9b09c !important;
 }

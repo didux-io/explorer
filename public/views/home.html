@@ -29,7 +29,7 @@
             <div class="todo-tasklist-item-text">
               <!-- <a href="/addr/{{t.miner}}">{{t.extraData}}</a>
               <br> -->
-              Mined by <a href="/addr/{{t.miner}}">{{t.miner}}</a><br>
+              Mined by <a href="/addr/{{t.miner}}">{{ t.checkSumMinerAddress }}</a><br>
               {{t.txn}} txns
             </div>
           </div>
@@ -59,14 +59,14 @@
         <div class="item"  ng-repeat="t in latest_txs track by $index">
           <div class="item-head">
             <div class="truncate-txhash" style="float:left">
-              TX <a href="/tx/{{t.hash}}" class="primary-link">{{t.hash}}</a>
+              TX <a href="/tx/{{t.hash}}" class="primary-link">{{t.checkSumTxHash}}</a>
             </div>
             <div class="item-date" style="float:right">{{t.timestamp | timeDuration }} ago</div>
           </div>
           <div class="todo-tasklist-controls">
-            <span class="todo-tasklist-item-text">From <a href="/addr/{{t.from}}">{{t.from.substr(0,24)}}...</a></span>
-            <span ng-show="t.to" class="todo-tasklist-item-text">To <a href="/addr/{{t.to}}">{{t.to.substr(0,24)}}...</a></span>
-            <span ng-show="t.creates" class="todo-tasklist-item-text">Creates <a href="/addr/{{t.creates}}">{{t.creates.substr(0,24)}}...</a></span><br>
+            <span class="todo-tasklist-item-text">From <a href="/addr/{{t.from}}">{{t.checkSumFromAddress.substr(0,24)}}...</a></span>
+            <span ng-show="t.to" class="todo-tasklist-item-text">To <a href="/addr/{{t.to}}">{{t.checkSumToAddress.substr(0,24)}}...</a></span>
+            <span ng-show="t.creates" class="todo-tasklist-item-text">Creates <a href="/addr/{{t.creates}}">{{t.checkSumCreatesAddress.substr(0,24)}}...</a></span><br>
             <div class="todo-tasklist-item-text" style="margin-top:4px;">{{t.value}} {{settings.symbol}}</div>
           </div>
         </div>

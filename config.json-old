@@ -1,0 +1,8 @@
+{
+    "gethAddress": "34.244.254.171",
+    "gethPort": 22000,
+    "blocks": [ {"start": 0, "end": "latest"}],
+    "quiet": true,
+    "terminateAtExistingDB": false,
+    "listenOnly": true
+}

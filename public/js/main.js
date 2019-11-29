@@ -325,9 +325,11 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvide
         })
 }]);
 BlocksApp.filter('timeDuration', function() {
-  return function(timestamp) {
+  function timeString(timestamp) {
     return getDuration(timestamp).toString();
   };
+  timeString.$stateful = true;
+  return timeString;
 })
 .filter('totalDifficulty', function() {
   return function(hashes) {

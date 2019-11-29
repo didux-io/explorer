@@ -171,7 +171,7 @@ li.ng-scope {
 }
 
 .navbar-nav > li.active > a {
-    border-bottom: 4px solid #032b3f !important;
+    border-bottom: 4px solid #032b3f;
 }
 
 @media (max-width: 992px) {

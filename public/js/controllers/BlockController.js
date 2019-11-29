@@ -9,6 +9,8 @@ angular.module('BlocksApp').controller('BlockController', function($stateParams,
     $scope.blockNum = $stateParams.number;
     $scope.settings = $rootScope.setup;
 
+    const web3 = new Web3();
+
     //fetch transactions
     $http({
       method: 'POST',
@@ -18,6 +20,7 @@ angular.module('BlocksApp').controller('BlockController', function($stateParams,
       if (resp.data.error)
         $location.path("/err404/block/" + $scope.blockNum);
       else {
+        resp.data.checkSummedMinerAddress = web3.toChecksumAddress(resp.data.miner);
         $scope.block = resp.data;
         $scope.block.datetime = new Date(resp.data.timestamp*1000); 
       }

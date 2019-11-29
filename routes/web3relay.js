@@ -46,7 +46,7 @@ try {
 
 //Create Web3 connection
 console.log(`Connecting ${config.nodeAddr}:${config.wsPort}...`);
-web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
+web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
 
 if (web3.eth.net.isListening()) console.log('Web3 connection established');
 else throw 'No connection, please specify web3host in conf.json';
@@ -68,7 +68,7 @@ var keepAlive = setInterval(async function() {
       console.log(await web3.eth.getNodeInfo());
     } catch(error) {
       console.log('Error in keep alive ws request. Reconnecting to node - web3relay.js');
-      web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
+      web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
     }
 }, 300 * 1000);
 
@@ -220,6 +220,11 @@ exports.data = async (req, res) => {
       const latestPrice = await Market.findOne().sort({ timestamp: -1 });
       addrData['balanceUSD'] = addrData.balance * latestPrice.quoteUSD;
     }
+
+    // console.log('addrData:', addrData);
+    // console.log('converting:', addrData.address);
+    // addrData.checksumAddress = web3.utils.toChecksumAddress(addrData.address);
+    // console.log('to:', addrData.checksumAddress);
 
     res.write(JSON.stringify(addrData));
     res.end();

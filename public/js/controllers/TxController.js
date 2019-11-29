@@ -25,7 +25,6 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
         return;
       }
       $scope.tx = resp.data;
-      console.log('$scope.tx:', $scope.tx);
       if (resp.data.timestamp)
         $scope.tx.datetime = new Date(resp.data.timestamp*1000); 
       // if (resp.data.isTrace) // Get internal txs
@@ -33,10 +32,8 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
     });
 
     var fetchInternalTxs = function() {
-      console.log('fetchInternalTxs for block hash:', $scope.tx.blockHash);
       const data = $scope.tx.blockHash;
       $http.post('/internal_addr_on_blockhash', {blockHash: data}).then(function(resp) {
-        console.log(resp.data);
         $scope.tx.internalTxs = resp.data;
       });
     }

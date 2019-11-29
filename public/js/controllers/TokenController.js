@@ -19,7 +19,6 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
       url: '/tokenrelay',
       data: {"action": "info", "address": address}
     }).then(function(resp) {
-      console.log(resp.data)
       $scope.token = resp.data;
       $scope.token.address = address;
       $scope.addr = {"bytecode": resp.data.bytecode};
@@ -44,7 +43,6 @@ angular.module('BlocksApp').controller('TokenController', function($stateParams,
             url: '/tokenrelay',
             data: {"action": "balanceOf", "user": addr, "address": address}
           }).then(function(resp) {
-            console.log(resp.data)
             $scope.showTokens = true;
             $scope.userTokens = resp.data.tokens;
           });

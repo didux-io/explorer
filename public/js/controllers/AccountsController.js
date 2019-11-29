@@ -1,6 +1,8 @@
 angular.module('BlocksApp').controller('AccountsController', function($stateParams, $rootScope, $scope, $http, $filter) {
   $scope.settings = $rootScope.setup;
 
+  const web3 = new Web3();
+
   // fetch accounts
   var getAccounts = function() {
     $("#table_accounts").DataTable({
@@ -51,7 +53,7 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
         {
           render:
             function(data, type, row) {
-              return '<a href="/addr/' + data +'">' + data + '</a>'
+              return '<a href="/addr/' + data +'">' + web3.toChecksumAddress(data) + '</a>'
             },
           targets: [1]
         },
@@ -91,5 +93,5 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
     });
   };
 
-  // getAccounts();
+  getAccounts();
 });
