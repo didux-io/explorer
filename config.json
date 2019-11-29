@@ -9,19 +9,18 @@
     "patchBlocks":  100,
     "bulkSize":     100,
     "settings": {
-        "symbol": "XSM",
-        "name": "Smilo Platform",
-        "title": "Smilo Platform Block Explorer",
+        "symbol": "XD",
+        "name": "Didux.io",
+        "title": "Didux Platform Block Explorer",
         "author": "Elaine, Cody, Hackmod, Bakon",
-        "contact": "info@smilo.io",
-        "about": "This is the Smilo Blockchain Explorer.",
-        "rss": "https://smilo.io",
-        "reddit": "https://www.reddit.com/r/SmiloPlatform/",
-        "twitter": "https://twitter.com/SmiloPlatform",
-        "linkedin": "https://www.linkedin.com/company/smilo-platform-bv/",
-        "github": "https://github.com/Smilo-platform/",
-        "logo": "/img/smilo-logo.png",
-        "copyright": "2019 &copy; Smilo Platform.",
+        "contact": "info@didux.io",
+        "about": "This is the Didux Blockchain Explorer.",
+        "rss": "https://didux.io",
+        "twitter": "https://twitter.com/DiduxVaults",
+        "linkedin": "https://www.linkedin.com/company/didux-io/",
+        "github": "https://github.com/didux-io/",
+        "logo": "/img/didux-logo.png",
+        "copyright": "2019 &copy; Didux Platform.",
         "poweredbyCustom": false,
         "poweredbyEtcImage": "/img/powered-by-etcexplorer-w.png",
         "poweredbyEtc": false,
@@ -29,9 +28,9 @@
         "useRichList": false,
         "useFiat": false,
         "miners": {
-            "0x18376081F21B97e7E6678a9e82B8d45928509f57": "Smilo Foundation",
-            "0x0fbc07ebdCE2BfeAd66F1686D67f9EA5c759E433": "Smilo Foundation",
-            "0x7cB791430D2461268691bfBA6e35d8a8C7eA2E63": "Smilo Foundation"
+            "0x18376081F21B97e7E6678a9e82B8d45928509f57": "Didux.io Foundation",
+            "0x0fbc07ebdCE2BfeAd66F1686D67f9EA5c759E433": "Didux.io Foundation",
+            "0x7cB791430D2461268691bfBA6e35d8a8C7eA2E63": "Didux.io Foundation"
         }
     }
 }

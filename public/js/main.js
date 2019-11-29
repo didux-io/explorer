@@ -108,7 +108,7 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvide
         .state('home', {
             url: "/home",
             templateUrl: "views/home.html",
-            data: {pageTitle: 'Blockchain Explorer'},
+            data: {pageTitle: 'Didux.io Blockchain Explorer'},
             controller: "HomeController",
             resolve: {
                 deps: ['$ocLazyLoad', function($ocLazyLoad) {

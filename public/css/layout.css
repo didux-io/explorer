@@ -1938,3 +1938,59 @@ body,html {
     display: none;
     transition: all 2s;
 }
+
+a {
+	color: #f4623a;
+}
+
+a:hover {
+	color: #c34e2e;
+}
+
+.item-border-green {
+    border-left: #f4623a 2px solid;
+}
+
+.todo-tasklist-item {
+    background-color: rgba(244,98,58, 0.05);
+}
+
+.todo-tasklist-item:hover {
+    background-color: rgba(244,98,58, 0.1) !important;
+}
+
+.btn-info {
+    border: none;
+    color: white;
+    background-color: #f4623a;
+}
+
+.btn-info:hover {
+    background-color: #c34e2e;
+}
+
+.primary-link {
+    color: #f4623a;
+}
+
+.tabbable-line>.nav-tabs>li.active {
+    border-bottom: 4px solid #f4623a;
+}
+
+.eth-stat-text {
+    color: #f4623a !important;
+}
+
+.pagination>.active>a {
+    background-color: #f4623a !important;
+    border-color: #f4623a !important;
+}
+
+.tabbable-line>.nav-tabs>li.open, .tabbable-line>.nav-tabs>li:hover {
+    border-bottom: 4px solid #f9b09c;
+}
+
+.page-spinner-bar img {
+    width: 100px;
+    margin-left: 40px;
+}
