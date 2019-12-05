@@ -1,7 +1,7 @@
 #!/bin/bash
 
-$(aws ecr get-login --no-include-email --region eu-west-1)
+$(aws ecr get-login --no-include-email --region eu-central-1)
 
-docker build --no-cache -t smilo/explorer:testnet .
-docker tag smilo/explorer:testnet 462619610638.dkr.ecr.eu-west-1.amazonaws.com/smilo/explorer:testnet
-docker push 462619610638.dkr.ecr.eu-west-1.amazonaws.com/smilo/explorer:testnet
+docker build --no-cache -t didux/explorer:test .
+docker tag didux/explorer:test 462619610638.dkr.ecr.eu-central-1.amazonaws.com/didux/explorer:test
+docker push 462619610638.dkr.ecr.eu-central-1.amazonaws.com/didux/explorer:test
