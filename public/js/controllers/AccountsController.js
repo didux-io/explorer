@@ -53,7 +53,7 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
         {
           render:
             function(data, type, row) {
-              return '<a href="/addr/' + data +'">' + web3.toChecksumAddress(data) + '</a>'
+              return '<a href="/addr/' + data +'">' + web3.utils.toChecksumAddress(data) + '</a>'
             },
           targets: [1]
         },

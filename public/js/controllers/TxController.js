@@ -4,6 +4,8 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
         App.initAjax();
     });
 
+    const web3 = new Web3();
+
     $rootScope.$state.current.data["pageSubTitle"] = $stateParams.hash;
     $scope.hash = $stateParams.hash;
     $scope.tx = {"hash": $scope.hash};
@@ -25,6 +27,8 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
         return;
       }
       $scope.tx = resp.data;
+      $scope.tx.checkSumFrom = web3.utils.toChecksumAddress($scope.tx.from);
+      $scope.tx.checkSumTo = web3.utils.toChecksumAddress($scope.tx.to);
       if (resp.data.timestamp)
         $scope.tx.datetime = new Date(resp.data.timestamp*1000); 
       // if (resp.data.isTrace) // Get internal txs

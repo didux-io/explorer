@@ -59,7 +59,7 @@
         <div class="item"  ng-repeat="t in latest_txs track by $index">
           <div class="item-head">
             <div class="truncate-txhash" style="float:left">
-              TX <a href="/tx/{{t.hash}}" class="primary-link">{{t.checkSumTxHash}}</a>
+              TX <a href="/tx/{{t.hash}}" class="primary-link">{{t.hash}}</a>
             </div>
             <div class="item-date" style="float:right">{{t.timestamp | timeDuration }} ago</div>
           </div>

@@ -27,7 +27,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
       $scope.activeTab = 'tab_addr_1';
     }
 
-    $rootScope.$state.current.data["pageSubTitle"] = web3.toChecksumAddress($stateParams.hash);
+    $rootScope.$state.current.data["pageSubTitle"] = web3.utils.toChecksumAddress($stateParams.hash);
     $scope.addrHash = $stateParams.hash;
     $scope.addr = {"balance": 0, "count": 0, "mined": 0};
     $scope.settings = $rootScope.setup;
@@ -153,7 +153,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           { "render": function(data, type, row) {
                         let checkSumCheckedAddress = data;
                         if (data !== null) {
-                          checkSumCheckedAddress = web3.toChecksumAddress(data);
+                          checkSumCheckedAddress = web3.utils.toChecksumAddress(data);
                         }
                         return '<a href="/addr/'+data+'">'+checkSumCheckedAddress+'</a>'
                       }, "targets": [2,3]},
@@ -161,7 +161,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
                         return '<a href="/block/'+data+'">'+data+'</a>'
                       }, "targets": [1]},
           { "render": function(data, type, row) {
-                        return '<a href="/tx/'+data+'">'+web3.toChecksumAddress(data)+'</a>'
+                        return '<a href="/tx/'+data+'">'+data+'</a>'
                       }, "targets": [0]},
           { "render": function(data, type, row) {
                         return getDuration(data).toString();
@@ -232,7 +232,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
           { "render": function(data, type, row) {
                         let checkSumCheckedAddress = data;
                         if (data !== null) {
-                          checkSumCheckedAddress = web3.toChecksumAddress(data);
+                          checkSumCheckedAddress = web3.utils.toChecksumAddress(data);
                         }
                         return '<a href="/addr/'+data+'">'+checkSumCheckedAddress+'</a>'
                       }, "targets": [2,3]},
@@ -240,7 +240,7 @@ angular.module('BlocksApp').controller('AddressController', function($stateParam
                         return '<a href="/block/'+data+'">'+data+'</a>'
                       }, "targets": [1]},
           { "render": function(data, type, row) {
-                        return '<a href="/tx/'+data+'">'+web3.toChecksumAddress(data)+'</a>'
+                        return '<a href="/tx/'+data+'">'+data+'</a>'
                       }, "targets": [0]},
           { "render": function(data, type, row) {
                         return getDuration(data).toString();

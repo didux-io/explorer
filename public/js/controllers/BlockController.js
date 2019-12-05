@@ -20,7 +20,7 @@ angular.module('BlocksApp').controller('BlockController', function($stateParams,
       if (resp.data.error)
         $location.path("/err404/block/" + $scope.blockNum);
       else {
-        resp.data.checkSummedMinerAddress = web3.toChecksumAddress(resp.data.miner);
+        resp.data.checkSummedMinerAddress = web3.utils.toChecksumAddress(resp.data.miner);
         $scope.block = resp.data;
         $scope.block.datetime = new Date(resp.data.timestamp*1000); 
       }

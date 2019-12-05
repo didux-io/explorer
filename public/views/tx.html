@@ -29,14 +29,14 @@
         <tr >
           <td width="25%">From:</td>
           <td>
-            <span ng-hide="tx.tokenFrom"><a href="/addr/{{tx.from}}">{{tx.from}}</a></span>
+            <span ng-hide="tx.tokenFrom"><a href="/addr/{{tx.from}}">{{tx.checkSumFrom}}</a></span>
             <span ng-show="tx.tokenFrom"><a href="/addr/{{tx.tokenFrom}}">{{tx.tokenFrom}}</a></span>
           </td>
         </tr>
         <tr ng-show="tx.to">
           <td width="25%">To:</td>
           <td>
-            <span ng-hide="tx.tokenTo"><a href="/addr/{{tx.to}}">{{tx.to}}</a></span>
+            <span ng-hide="tx.tokenTo"><a href="/addr/{{tx.to}}">{{tx.checkSumTo}}</a></span>
             <span ng-show="tx.tokenTo"><a href="/addr/{{tx.tokenTo}}">{{tx.tokenTo}}</a></span>
             <div ng-show="tx.internalTxs.length > 0" class="internal_full_box">
                 <div ng-repeat="itx in tx.internalTxs track by $index" 

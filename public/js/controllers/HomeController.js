@@ -16,7 +16,7 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
         data: {"action": "latest_blocks"}
       }).then(function(resp) {
         for (let i = 0; i < resp.data.blocks.length; i++) {
-          resp.data.blocks[i].checkSumMinerAddress = web3.toChecksumAddress(resp.data.blocks[i].miner);
+          resp.data.blocks[i].checkSumMinerAddress = web3.utils.toChecksumAddress(resp.data.blocks[i].miner);
         }
         $scope.latest_blocks = resp.data.blocks;
         $scope.blockLoading = false;
@@ -31,11 +31,11 @@ angular.module('BlocksApp').controller('HomeController', function($rootScope, $s
       }).then(function(resp) {
         $scope.latest_txs = resp.data.txs;
         for (let i = 0; i < resp.data.txs.length; i++) {
-          resp.data.txs[i].checkSumToAddress = web3.toChecksumAddress(resp.data.txs[i].to);
-          resp.data.txs[i].checkSumFromAddress = web3.toChecksumAddress(resp.data.txs[i].from);
-          resp.data.txs[i].checkSumTxHash = web3.toChecksumAddress(resp.data.txs[i].hash);
+          resp.data.txs[i].checkSumToAddress = web3.utils.toChecksumAddress(resp.data.txs[i].to);
+          resp.data.txs[i].checkSumFromAddress = web3.utils.toChecksumAddress(resp.data.txs[i].from);
+          // resp.data.txs[i].checkSumTxHash = web3.utils.toChecksumAddress(resp.data.txs[i].hash);
           if (resp.data.txs[i].creates) {
-            resp.data.txs[i].checkSumCreatesAddress = web3.toChecksumAddress(resp.data.txs[i].creates);
+            resp.data.txs[i].checkSumCreatesAddress = web3.utils.toChecksumAddress(resp.data.txs[i].creates);
           }
         }
         $scope.txLoading = false;
