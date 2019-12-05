@@ -4,7 +4,7 @@
     "startBlock":   "0",
     "endBlock":     "latest",
     "quiet":        true,
-    "syncAll":      true,
+    "syncAll":      false,
     "patch":        true,
     "patchBlocks":  100,
     "bulkSize":     1000,
@@ -40,7 +40,7 @@
             "0x41e7a72b843ffa7813ff979dc8bc21429e461ad9": "Didux node 10",
             "0x501ec2563de403a87acfe6631d50d90aabdd1a03": "Didux node 11",
             "0x4a2d36406509336db56818f356c4f631388e7dd4": "Didux node 12",
-            "0xbc75c3B64e7621469509df5Cdd61F4f419eC903F": "Didux.io Foundation",
+            "0xbc75c3B64e7621469509df5Cdd61F4f419eC903F": "Didux.io Foundation"
         }
     }
 }
