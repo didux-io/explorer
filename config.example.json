@@ -1,5 +1,5 @@
 {
-    "nodeAddr":     "testnet-wallet.smilo.network/ws",
+    "nodeAddr":     "wss://testnet-wallet.smilo.network/ws",
     "wsPort":       443,
     "startBlock":   0,
     "endBlock":     "latest",

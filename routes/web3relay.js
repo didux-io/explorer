@@ -46,7 +46,7 @@ try {
 
 //Create Web3 connection
 console.log(`Connecting ${config.nodeAddr}:${config.wsPort}...`);
-web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
+web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
 
 if (web3.eth.net.isListening()) console.log('Web3 connection established');
 else throw 'No connection, please specify web3host in conf.json';
@@ -68,7 +68,7 @@ var keepAlive = setInterval(async function() {
       console.log(await web3.eth.getNodeInfo());
     } catch(error) {
       console.log('Error in keep alive ws request. Reconnecting to node - web3relay.js');
-      web3 = new Web3(new Web3.providers.WebsocketProvider(`wss://${config.nodeAddr}:${config.wsPort}`));
+      web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
     }
 }, 300 * 1000);
 
