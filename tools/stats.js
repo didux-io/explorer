@@ -43,7 +43,7 @@ var keepAlive = setInterval(async function() {
     console.log('Error in keep alive ws request. Reconnecting to node - stats.js');
     web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort.toString()}`));
   }
-}, 300 * 1000);
+}, 60 * 1000);
 
 const updateStats = async (range, interval, rescan) => {
   let latestBlock = await web3.eth.getBlockNumber();

@@ -29,7 +29,7 @@ services:
   richlist:
     build: .
     command: ./tools/richlist.js
-    restart: "no"
+    restart: always
     environment:
       MONGO_URI: 'mongodb://db/explorerDB'
     depends_on:

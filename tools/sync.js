@@ -781,15 +781,11 @@ var keepAlive = setInterval(async function() {
     } catch(error) {
       console.log('Error in keep alive ws request. Reconnecting to node - sync.js');
       web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort.toString()}`));
+      listenBlocks(config);
     }
-}, 300 * 1000);
+}, 60 * 1000);
 
-// const value = web3.utils.hexToNumber('0x31f5c4ed27680000');
-
-// const value = parseInt('0x31f5c4ed27680000', 16);
-
-const testData = '0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c40000000000000000000000002ec3a912b3815c676064fb823bcf0c584809eda2000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000031f5c4ed27680000000000000000000000000000000000000000000000000000214e8348c4f00000';
-
+// Didux Quake contract ABI
 const abi = [
 	{
 		"constant": true,
@@ -1023,11 +1019,3 @@ const abi = [
 	}
 ];
 abiDecoder.addABI(abi);
-
-// const decodedData = abiDecoder.decodeMethod(testData);
-
-// const winnersAddresses = decodedData.params[0].value;
-// const winnersAmounts = decodedData.params[1].value;
-
-// console.log('winnersAddresses:', winnersAddresses);
-// console.log('winnersAmounts:', winnersAmounts);

@@ -1,6 +1,6 @@
 {
-    "nodeAddr":     "ws://localhost",
-    "wsPort":       23001,
+    "nodeAddr":     "wss://ws-eu.didux.network",
+    "wsPort":       443,
     "startBlock":   0,
     "endBlock":     "latest",
     "quiet":        true,

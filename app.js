@@ -81,7 +81,7 @@ var keepAlive = setInterval(async function() {
       console.log('Error in keep alive ws request. Reconnecting to node - app.js');
       web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
     }
-}, 300 * 1000);
+}, 60 * 1000);
 
 // https://github.com/Smilo-platform/Wiki/wiki/Masternode-block-reward
 function getTotalXsmCreated(totalBlocks) {
@@ -117,6 +117,9 @@ function getTotalXsmCreated(totalBlocks) {
             blocks: blocks
         }
     }, {reward: 0, blocks: totalBlocks});
+
+    // Increment calculation with pre-mined Foundation tokens
+    totalXsmCreated += 80000000;
 
     return totalXsmCreated.reward;
 }
