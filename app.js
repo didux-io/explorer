@@ -119,7 +119,7 @@ function getTotalXsmCreated(totalBlocks) {
     }, {reward: 0, blocks: totalBlocks});
 
     // Increment calculation with pre-mined Foundation tokens
-    totalXsmCreated += 80000000;
+    totalXsmCreated.reward += 80000000;
 
     return totalXsmCreated.reward;
 }
