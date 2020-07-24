@@ -1,7 +1,7 @@
 {
     "nodeAddr":     "wss://ws-eu.didux.network",
     "wsPort":       443,
-    "startBlock":   0,
+    "startBlock":   1287806,
     "endBlock":     "latest",
     "quiet":        true,
     "syncAll":      true,

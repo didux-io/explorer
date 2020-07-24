@@ -9,9 +9,11 @@
         <div class="col-md-6 center">
           <div>
             <span class="eth-stat-title2">
-            {{ addr.balance | number: 4 }} {{ settings.symbol }}</span><br>
+              {{ addr.balance | number: 4 }} {{ settings.symbol }}</span><br>
             <span class="eth-stat-text">
-            {{ settings.symbol }} Balance <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="Note: Balance may not reflect transaction data if you have transactions resulting from Contract Internal Transactions. We are working on adding that functionality."></i>
+              {{ settings.symbol }} Balance <i class="fa fa-question-circle" data-toggle="tooltip"
+                data-placement="right"
+                title="Note: Balance may not reflect transaction data if you have transactions resulting from Contract Internal Transactions. We are working on adding that functionality."></i>
             </span><br>
             <!-- <div ng-show="settings.useFiat" class="margin-top-20">
               <span class="fade">{{ addr.balanceUSD | currency : "$" : 4 }}</span> <span class="eth-stat-text fade">USD balance</span>
@@ -50,22 +52,28 @@
       <div class="tabbable-line">
         <ul class="nav nav-tabs ">
           <li ng-class="{active: activeTab == 'tab_addr_1' || !activeTab}" ng-click="changeActiveTab(1);">
-            <a href="#tab_addr_1" data-toggle="tab" aria-expanded="true">Transactions </a>
+            <a href="#tab_addr_1" data-toggle="tab" aria-expanded="true">Transactions</a>
           </li>
-          <li  ng-class="{active: activeTab == 'tab_addr_2'}" ng-click="changeActiveTab(2);">
-            <a href="#tab_addr_2" data-toggle="tab" aria-expanded="false">Internal Transactions </a>
+          <li ng-class="{active: activeTab == 'tab_addr_2'}" ng-click="changeActiveTab(2);">
+            <a href="#tab_addr_2" data-toggle="tab" aria-expanded="false">Internal Transactions</a>
           </li>
-          <li class="" ng-show="addr.isContract" ng-class="{active: activeTab == 'tab_addr_3'}" ng-click="changeActiveTab(3);">
-            <a href="#tab_addr_3" data-toggle="tab" aria-expanded="false">Contract Source </a>
+          <li class="" ng-show="addr.isContract" ng-class="{active: activeTab == 'tab_addr_3'}"
+            ng-click="changeActiveTab(3);">
+            <a href="#tab_addr_3" data-toggle="tab" aria-expanded="false">Contract Source</a>
           </li>
           <li ng-class="{active: activeTab == 'tab_addr_4' || !activeTab}" ng-click="changeActiveTab(4);">
-              <a href="#tab_addr_4" data-toggle="tab" aria-expanded="false">Mined Blocks </a>
+            <a href="#tab_addr_4" data-toggle="tab" aria-expanded="false">Mined Blocks</a>
+          </li>
+          <li ng-class="{active: activeTab == 'tab_addr_5' || !activeTab}" ng-click="changeActiveTab(5);">
+            <a href="#tab_addr_5" data-toggle="tab" aria-expanded="false">Claims</a>
           </li>
         </ul>
         <div class="tab-content">
-          <div class="tab-pane table-container" ng-class="{active: activeTab == 'tab_addr_1' || !activeTab}" id="tab_addr_1">
+          <div class="tab-pane table-container" ng-class="{active: activeTab == 'tab_addr_1' || !activeTab}"
+            id="tab_addr_1">
             <!-- Datatable tab -->
-            <table class="table table-striped table-hover" id="table_txs" style="table-layout:fixed;width: 98% !important;">
+            <table class="table table-striped table-hover" id="table_txs"
+              style="table-layout:fixed;width: 98% !important;">
               <thead>
                 <tr role="row" class="heading">
                   <th width="15%"> TxHash </th>
@@ -82,7 +90,8 @@
           </div>
           <!-- End: Datatable tab -->
           <div class="tab-pane" id="tab_addr_2" ng-class="{active: activeTab == 'tab_addr_2'}">
-            <table class="table table-striped table-hover" id="table_internal_txs" style="table-layout:fixed;width: 98% !important;">
+            <table class="table table-striped table-hover" id="table_internal_txs"
+              style="table-layout:fixed;width: 98% !important;">
               <thead>
                 <tr role="row" class="heading">
                   <th width="15%"> TxHash </th>
@@ -97,24 +106,42 @@
               <tbody></tbody>
             </table>
           </div>
-          <div class="tab-pane table-container" ng-show="activeTab == 'tab_addr_4'" ng-class="{active: activeTab == 'tab_addr_4' || !activeTab}" id="tab_addr_4">
-          <!-- Datatable tab -->
-              <table class="table table-striped table-hover" id="table_mined_blocks" style="table-layout:fixed;width: 98% !important;">
-                  <thead>
-                      <tr role="row" class="heading">
-                          <th width="15%">Block Number</th>
-                          <th width="8%">Reward</th>
-                          <th width="15%">Gas Used</th>
-                          <th width="10%">Gas Limit</th>
-                          <th width="12%">Date</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      
-                  </tbody>
-              </table>
+          <div class="tab-pane table-container" ng-show="activeTab == 'tab_addr_4'"
+            ng-class="{active: activeTab == 'tab_addr_4' || !activeTab}" id="tab_addr_4">
+            <!-- Datatable tab -->
+            <table class="table table-striped table-hover" id="table_mined_blocks"
+              style="table-layout:fixed;width: 98% !important;">
+              <thead>
+                <tr role="row" class="heading">
+                  <th width="15%">Block Number</th>
+                  <th width="8%">Reward</th>
+                  <th width="15%">Gas Used</th>
+                  <th width="10%">Gas Limit</th>
+                  <th width="12%">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+            </table>
           </div>
-          <div class="tab-pane" id="tab_addr_3" ng-show="addr.isContract" ng-class="{active: activeTab == 'tab_addr_3'}">
+          <div class="tab-pane table-container" ng-show="activeTab == 'tab_addr_5'"
+            ng-class="{active: activeTab == 'tab_addr_5' || !activeTab}" id="tab_addr_5">
+            <table class="table table-striped table-hover" id="table_claims"
+              style="table-layout:fixed;width: 98% !important;">
+              <thead>
+                <tr role="row" class="heading">
+                  <th width="15%">Claim ID</th>
+                  <th width="15%">Claim Type</th>
+                </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+            </table>
+          </div>
+          <div class="tab-pane" id="tab_addr_3" ng-show="addr.isContract"
+            ng-class="{active: activeTab == 'tab_addr_3'}">
             <contract-source></contract-source>
           </div>
         </div>

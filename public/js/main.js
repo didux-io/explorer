@@ -143,6 +143,27 @@ BlocksApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvide
                 }]
             }
         })
+        .state('claim', {
+            url: "/claim{dummy:(?:ess)?}/{claimId}/{didContractAddress}",
+            templateUrl: "views/claim.html",
+            data: {pageTitle: 'Claim Id'},
+            controller: "ClaimController",
+            resolve: {
+                deps: ['$ocLazyLoad', function($ocLazyLoad) {
+                    return $ocLazyLoad.load({
+                        name: 'BlocksApp',
+                        insertBefore: '#ng_load_plugins_before', // load the above css files before '#ng_load_plugins_before'
+                        files: [
+                             '/js/controllers/ClaimController.js',
+                            '/plugins/datatables/datatables.min.css',
+                            '/plugins/datatables/datatables.bootstrap.css',
+                            '/plugins/datatables/datatables.all.min.js',
+                            '/plugins/datatables/datatable.min.js'
+                        ]
+                    });
+                }]
+            }
+        })
         .state('accounts', {
             url: "/accounts",
             templateUrl: "views/accounts.html",

@@ -194,3 +194,7 @@ You can configure intervals (how often a new data point is pulled) and range (ho
 Set `nodeAddr` in `config.json` to `host.docker.internal`
 
 Run `docker-compose up`
+
+# Quick start mongo DB (if installed)
+
+`mongod --dbpath=/Users/danielleushuis/data/db`
