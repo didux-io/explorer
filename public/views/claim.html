@@ -17,9 +17,9 @@
                     <p class="bold">{{ dataParsed.link }}</p>
                 </div>
                 <div class="proof-div-34 padding-left">
-                    <p class="sub-title">Time & Date</p>
-                    <p class="bold no-margin-bottom">{{ timestamp | date:'hh:mm:ss' }}</p>
-                    <p class="bold">{{ timestamp | date:'dd MMMM yyyy' }}</p>
+                    <p class="sub-title">Date & Block</p>
+                    <p class="bold no-margin-bottom">{{ timestamp | date:'hh:mm:ss' }}  {{ timestamp | date:'dd MMMM yyyy' }}</p>
+                    <a class="bold txhash" target="_blank" href="https://explorer.didux.network/block/{{ claim.blockNumber }}">#{{ claim.blockNumber }}</a>
                 </div>
             </div>
             <div class="proof-sub-info-div">

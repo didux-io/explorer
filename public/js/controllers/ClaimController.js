@@ -8,7 +8,7 @@ angular.module('BlocksApp').controller('ClaimController', function ($stateParams
 
     const web3 = new Web3('https://api.didux.network/');
 
-    const METHOD_DIC = { '0xe280f7ab': 'addClaimWithClaimId' };
+    const METHOD_DIC = { '0xb1a34e0d': 'addClaim' };
 
     $scope.claimId = $stateParams.claimId;
     $scope.didContractAddress = $stateParams.didContractAddress;
@@ -32,12 +32,13 @@ angular.module('BlocksApp').controller('ClaimController', function ($stateParams
                 for (const txHash of blockTransactions) {
                     const web3 = new Web3('https://api.didux.network/');
                     const tx = await web3.eth.getTransaction(txHash);
+                    console.log('tx:', tx);
                     // Check if the transaction was made to this contract
                     if (tx.to.toLowerCase() == $scope.didContractAddress.toLowerCase()) {
                         const txInput = tx.input;
                         const methodCode = txInput.substr(0, 10);
                         // Check if the method was to add a claim
-                        if (METHOD_DIC[methodCode] === 'addClaimWithClaimId') {
+                        if (METHOD_DIC[methodCode] === 'addClaim') {
                             addABI(didContractAbi)
                             const data = decodeMethod(txInput);
                             const dataHex = data.params[4].value;
@@ -465,49 +466,6 @@ var didContractAbi = [
         ],
         payable: false,
         stateMutability: 'view',
-        type: 'function'
-    },
-    {
-        constant: false,
-        inputs: [
-            {
-                name: '_claimType',
-                type: 'uint256'
-            },
-            {
-                name: '_scheme',
-                type: 'uint256'
-            },
-            {
-                name: '_issuer',
-                type: 'address'
-            },
-            {
-                name: '_signature',
-                type: 'bytes'
-            },
-            {
-                name: '_data',
-                type: 'bytes'
-            },
-            {
-                name: '_uri',
-                type: 'string'
-            },
-            {
-                name: '_claimId',
-                type: 'bytes'
-            }
-        ],
-        name: 'addClaimWithClaimId',
-        outputs: [
-            {
-                name: 'claimRequestId',
-                type: 'bytes32'
-            }
-        ],
-        payable: false,
-        stateMutability: 'nonpayable',
         type: 'function'
     },
     {
