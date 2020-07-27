@@ -3,7 +3,7 @@
         <div class="portlet-title">
             <div class="caption">Certificate</div>
         </div>
-        <div class="proof-div">
+        <div class="proof-div" ng-show="claim.claimType == 1000">
             <div class="proof-header-div">
                 <img ng-show="!dataParsed.template || dataParsed.template == 'proofme'" src="/img/proofmeblue.png">
                 <img ng-show="dataParsed.template && dataParsed.template == 'aliveshoes'" src="/img/aliveshoes.png">
@@ -48,39 +48,11 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="claim-item">
-            <p class="claim-title">Type</p>
-            <p class="claim-value">{{ claim.claimType }}</p>
-            <p class="claim-title">Issuer</p>
-            <a class="claim-value" href="/addr/{{claim.issuer}}" + >{{ claim.issuer }}</a>
-            <div ng-show="claim.claimType == 1000">
-                <p class="claim-title">Hash</p>
-                <p class="claim-value">{{ dataParsed.hash }}</p>
-                <p class="claim-title">Did</p>
-                <p class="claim-value">{{ dataParsed.did }}</p>
-                <p class="claim-title">Link</p>
-                <p class="claim-value">{{ dataParsed.link }}</p>
-                <p class="claim-title">Proof</p>
-                <p class="claim-value">{{ dataParsed.proof }}</p>
-                <p class="claim-title">Type</p>
-                <p class="claim-value">{{ dataParsed.type }}</p>
-                <p class="claim-title" ng-show="dataParsed.template">Template</p>
-                <p class="claim-value" ng-show="dataParsed.template">{{ dataParsed.template }}</p>
-                <p class="claim-title" ng-show="claim.blockNumber">Block Number</p>
-                <p class="claim-value" ng-show="claim.blockNumber">{{ claim.blockNumber }}</p>
+        <div ng-show="claim.claimType == 999">
+            <div ng-repeat="(key, value) in dataParsed">
+                <p class="claim-title" >{{ key | uppercase }}</p>
+                <p class="claim-value">{{ value }}</p>
             </div>
-            <div ng-show="claim.claimType == 999">
-                <p class="claim-title">Address</p>
-                <p class="claim-value">{{ dataParsed.address }}</p>
-                <p class="claim-title">City</p>
-                <p class="claim-value">{{ dataParsed.city }}</p>
-                <p class="claim-title">Name</p>
-                <p class="claim-value">{{ dataParsed.name }}</p>
-                <p class="claim-title">Contact</p>
-                <p class="claim-value">{{ dataParsed.contact }}</p>
-                <p class="claim-title" ng-show="claim.blockNumber">Block Number</p>
-                <p class="claim-value" ng-show="claim.blockNumber">{{ claim.blockNumber }}</p>
-            </div>
-        </div> -->
+        </div> 
     </div>
 </div>
