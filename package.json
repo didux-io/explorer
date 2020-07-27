@@ -20,6 +20,7 @@
     "abi-decoder": "^2.2.2",
     "bignumber.js": "^8.1.1",
     "body-parser": "^1.18.3",
+    "browserify": "^16.5.1",
     "concurrently": "4.1.0",
     "cors": "^2.8.4",
     "ejs": "2.6.1",

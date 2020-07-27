@@ -1,9 +1,54 @@
 <div class="row">
     <div class="col-md-12 portlet light">
         <div class="portlet-title">
-            <div class="caption"><span>Claim </span>Overview</div>
+            <div class="caption">Certificate</div>
         </div>
-        <div class="claim-item">
+        <div class="proof-div">
+            <div class="proof-header-div">
+                <img ng-show="!dataParsed.template || dataParsed.template == 'proofme'" src="/img/proofmeblue.png">
+                <img ng-show="dataParsed.template && dataParsed.template == 'aliveshoes'" src="/img/aliveshoes.png">
+                <div class="header-bar"></div>
+                <p class="proofme-text-header">BLOCKCHAIN CERTIFICATE</p>
+            </div>
+            <div class="proof-sub-info-div">
+                <div class="proof-div-66">
+                    <p class="sub-title">Type & Link</p>
+                    <p class="bold">{{ dataParsed.type }}</p>
+                    <p class="bold">{{ dataParsed.link }}</p>
+                </div>
+                <div class="proof-div-34 padding-left">
+                    <p class="sub-title">Time & Date</p>
+                    <p class="bold no-margin-bottom">{{ timestamp | date:'hh:mm:ss' }}</p>
+                    <p class="bold">{{ timestamp | date:'dd MMMM yyyy' }}</p>
+                </div>
+            </div>
+            <div class="proof-sub-info-div">
+                <div class="proof-div-66">
+                    <p class="sub-title txhash">Blockchain Transaction</p>
+                    <a class="bold txhash" target="_blank" href="https://explorer.didux.network/tx/{{ tx.hash }}">https://explorer.didux.network/tx/{{ tx.hash }}</a>
+                </div>
+                <div class="proof-div-34 padding-left">
+                    <p class="sub-title">Hash</p>
+                    <p class="bold">{{ dataParsed.hash }}</p>
+                </div>
+            </div>
+            <div class="proof-sub-info-div">
+                <div class="proof-div-50 border-right">
+                    <p class="sub-title">Proof</p>
+                    <p class="bold">{{ dataParsed.proof }}</p>
+                </div>
+                <div class="proof-div-50 padding-left">
+                    <p class="sub-title">Did</p>
+                    <p class="bold">{{ dataParsed.did }}</p>
+                </div>
+            </div>
+            <div class="proof-content">
+                <div class="proof-content-div">
+                    <p> {{ tx }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="claim-item">
             <p class="claim-title">Type</p>
             <p class="claim-value">{{ claim.claimType }}</p>
             <p class="claim-title">Issuer</p>
@@ -21,6 +66,8 @@
                 <p class="claim-value">{{ dataParsed.type }}</p>
                 <p class="claim-title" ng-show="dataParsed.template">Template</p>
                 <p class="claim-value" ng-show="dataParsed.template">{{ dataParsed.template }}</p>
+                <p class="claim-title" ng-show="claim.blockNumber">Block Number</p>
+                <p class="claim-value" ng-show="claim.blockNumber">{{ claim.blockNumber }}</p>
             </div>
             <div ng-show="claim.claimType == 999">
                 <p class="claim-title">Address</p>
@@ -31,7 +78,9 @@
                 <p class="claim-value">{{ dataParsed.name }}</p>
                 <p class="claim-title">Contact</p>
                 <p class="claim-value">{{ dataParsed.contact }}</p>
+                <p class="claim-title" ng-show="claim.blockNumber">Block Number</p>
+                <p class="claim-value" ng-show="claim.blockNumber">{{ claim.blockNumber }}</p>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
