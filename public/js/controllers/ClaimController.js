@@ -15,7 +15,7 @@ angular.module('BlocksApp').controller('ClaimController', function ($stateParams
     $rootScope.$state.current.data["pageSubTitle"] = $scope.claimId;
 
     var getClaimData = async () => {
-        try {
+        // try {
             const contract = new web3.eth.Contract(didContractAbi, $scope.didContractAddress);
             const claim = await contract.methods.getClaim($scope.claimId).call();
             console.log('claim:', claim);
@@ -47,6 +47,14 @@ angular.module('BlocksApp').controller('ClaimController', function ($stateParams
                                 // Set the timestamp and transaction hash
                                 $scope.timestamp = new Date(blockData.timestamp * 1000);
                                 $scope.tx = tx;
+                                new QRCode(document.getElementById("claim-qrcode"), {
+                                    text: "https://explorer.didux.network/tx/" + tx.hash,
+                                    width: 128,
+                                    height: 128,
+                                    colorDark : "#000000",
+                                    colorLight : "#ffffff",
+                                    correctLevel : QRCode.CorrectLevel.H
+                                });
                                 break;
                             }
                         }
@@ -56,10 +64,10 @@ angular.module('BlocksApp').controller('ClaimController', function ($stateParams
                 }
             }
             $scope.$applyAsync()
-        } catch (error) {
-            // Don't log an error, it's fine. The table will show the empty claims text
-            console.log('No claims for addr:', $scope.didContractAddress);
-        }
+        // } catch (error) {
+        //     // Don't log an error, it's fine. The table will show the empty claims text
+        //     console.log('No claims for addr:', $scope.didContractAddress);
+        // }
     }
 
     getClaimData()

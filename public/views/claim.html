@@ -5,8 +5,8 @@
         </div>
         <div class="proof-div" ng-show="claim.claimType == 1000">
             <div class="proof-header-div">
-                <img ng-show="!dataParsed.template || dataParsed.template == 'proofme'" src="/img/proofmeblue.png">
-                <img ng-show="dataParsed.template && dataParsed.template == 'aliveshoes'" src="/img/aliveshoes.png">
+                <img ng-show="!dataParsed.template || dataParsed.template == 'proofme'" class="template-img" src="/img/proofmeblue.png">
+                <img ng-show="dataParsed.template && dataParsed.template == 'aliveshoes'" class="template-img" src="/img/aliveshoes.png">
                 <div class="header-bar"></div>
                 <p class="proofme-text-header">BLOCKCHAIN CERTIFICATE</p>
             </div>
@@ -25,21 +25,28 @@
             <div class="proof-sub-info-div">
                 <div class="proof-div-66">
                     <p class="sub-title txhash">Blockchain Transaction</p>
-                    <a class="bold txhash" target="_blank" href="https://explorer.didux.network/tx/{{ tx.hash }}">https://explorer.didux.network/tx/{{ tx.hash }}</a>
+                    <div class="padding-right">
+                        <a class="bold txhash" target="_blank" href="https://explorer.didux.network/tx/{{ tx.hash }}">https://explorer.didux.network/tx/{{ tx.hash }}</a>
+                    </div>
                 </div>
                 <div class="proof-div-34 padding-left">
                     <p class="sub-title">Hash</p>
-                    <p class="bold">{{ dataParsed.hash }}</p>
+                    <p class="bold padding-right">{{ dataParsed.hash }}</p>
                 </div>
             </div>
-            <div class="proof-sub-info-div">
-                <div class="proof-div-50 border-right">
-                    <p class="sub-title">Proof</p>
-                    <p class="bold">{{ dataParsed.proof }}</p>
+            <div class="proof-sub-info-div flex-sub-section">
+                <div class="proof-div-66">
+                    <div class="border-bottom">
+                        <p class="sub-title">Proof</p>
+                        <p class="bold padding-right">{{ dataParsed.proof }}</p>
+                    </div>
+                    <div class="padding-top">
+                        <p class="sub-title">Did</p>
+                        <p class="bold padding-right">{{ dataParsed.did }}</p>
+                    </div>
                 </div>
-                <div class="proof-div-50 padding-left">
-                    <p class="sub-title">Did</p>
-                    <p class="bold">{{ dataParsed.did }}</p>
+                <div class="qrcode-div proof-div-34">
+                    <div id="claim-qrcode"></div>
                 </div>
             </div>
             <div class="proof-content">

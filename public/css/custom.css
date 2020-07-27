@@ -240,7 +240,7 @@ tr {
     display: flex;
     margin-bottom: 12px;
 }
-.proof-header-div img {
+.template-img {
     width: 200px;
 }
 .header-bar {
@@ -258,7 +258,6 @@ tr {
     margin-top: 0;
 }
 .proof-div-66 {
-    padding-right: 12px;
     padding-top: 8px;
     padding-bottom: 8px;
     width: 66%;
@@ -306,4 +305,24 @@ tr {
     letter-spacing: 3px;
     margin-top: 22px;
     padding-left: 18px;
+}
+#claim-qrcode {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+.qrcode-div {
+    display: flex;
+    justify-content: center;
+}
+.flex-sub-section {
+    display: flex;
+}
+.border-bottom {
+    border-bottom: 2px solid black;
+}
+.padding-top {
+    padding-top: 8px;
+}
+.padding-right {
+    padding-right: 12px;
 }
