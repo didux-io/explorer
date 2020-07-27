@@ -263,6 +263,12 @@ tr {
     width: 66%;
     border-right: 2px solid black;
 }
+.proof-div-66-sub {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    width: 66%;
+    border-right: 2px solid black;
+}
 .proof-div-34 {
     padding-top: 8px;
     padding-bottom: 8px;
@@ -325,4 +331,23 @@ tr {
 }
 .padding-right {
     padding-right: 12px;
+}
+.page-title h1 {
+    word-break: break-all;
+}
+
+@media (max-width: 1024px) {
+    .template-img {
+        max-height: 40px;
+        margin-top: 20px;
+    }
+
+    .qrcode-div {
+        display: none;
+    }
+
+    .proof-div-66-sub {
+        border-right: none;
+        width: 100%;
+    }
 }
