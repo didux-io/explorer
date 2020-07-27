@@ -8,7 +8,7 @@ angular.module('BlocksApp').controller('ClaimController', function ($stateParams
 
     const web3 = new Web3('https://api.didux.network/');
 
-    const METHOD_DIC = { '0xe280f7ab': 'addClaim' };
+    const METHOD_DIC = { '0xe280f7ab': 'addClaimWithClaimId' };
 
     $scope.claimId = $stateParams.claimId;
     $scope.didContractAddress = $stateParams.didContractAddress;
@@ -37,7 +37,7 @@ angular.module('BlocksApp').controller('ClaimController', function ($stateParams
                         const txInput = tx.input;
                         const methodCode = txInput.substr(0, 10);
                         // Check if the method was to add a claim
-                        if (METHOD_DIC[methodCode] === 'addClaim') {
+                        if (METHOD_DIC[methodCode] === 'addClaimWithClaimId') {
                             addABI(didContractAbi)
                             const data = decodeMethod(txInput);
                             const dataHex = data.params[4].value;
