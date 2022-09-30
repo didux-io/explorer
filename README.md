@@ -4,7 +4,7 @@
 
 <b>Live Version: [didux.io](https://explorer.didux.network/)</b>
 
-Follow the project progress at: [Didux Block Explorer Development](https://github.com/didux-io/Didux-Explorer)
+Follow the project progress at: [Didux Block Explorer Development](https://github.com/didux-io/Explorer)
 
 ## Local installation
 
