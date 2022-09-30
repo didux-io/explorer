@@ -35,7 +35,7 @@ jobs:
         with:
           name: "version.json"
           json: ${{ env.VERSIONING }}
-          dir: 'src/assets'
+          dir: './'
       - uses: kciter/aws-ecr-action@v1
         with:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
