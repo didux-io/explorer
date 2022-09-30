@@ -12,9 +12,7 @@ function filterTX(txs, value) {
 }
 
 function filterMinedBlock(mbs, value) {
-  return mbs.map(function(mb){
-      return [mb.number, mb.blockReward, mb.gasUsed, mb.gasLimit, mb.timestamp]
-  })
+  return mbs.map(mb => [mb.number, mb.blockReward, mb.gasUsed, mb.gasLimit, mb.timestamp]);
 }
 
 function filterTrace(txs, value) {

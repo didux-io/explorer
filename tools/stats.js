@@ -7,27 +7,29 @@ const Web3 = require('web3');
 
 const mongoose = require('mongoose');
 const { BlockStat } = require('../db.js');
+const local = require("../config.json");
 
 // load config.json
-const config = { nodeAddr: 'localhost', wsPort: 8546, bulkSize: 100 };
+const config = { bulkSize: 100 };
 try {
-  var local = require('../config.json');
+  const local = require('../config.json');
   _.extend(config, local);
   console.log('config.json found.');
 } catch (error) {
-  if (error.code === 'MODULE_NOT_FOUND') {
-    var local = require('../config.example.json');
-    _.extend(config, local);
-    console.log('No config file found. Using default configuration... (config.example.json)');
-  } else {
-    throw error;
-    process.exit(1);
-  }
+  console.log('Error:', error);
+  process.exit(1);
 }
 
-console.log(`Connecting ${config.nodeAddr}:${config.wsPort}...`);
+if (!config.nodeAddr && config.nodes) {
+  config.nodeAddr = config.nodes[Math.floor(Math.random() * config.nodes.length)];
+} else {
+  console.error('No node configured');
+  process.exit(1);
+}
+
+console.log(`Connecting ${config.nodeAddr}...`);
 // Sets address for RPC WEB3 to connect to, usually your node IP address defaults ot localhost
-let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort.toString()}`));
+let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
 
 if (web3.eth.net.isListening()) console.log('stats.js - Web3 connection established');
 else throw 'stats.js - No connection, please specify web3host in conf.json';
@@ -35,13 +37,13 @@ if ('quiet' in config && config.quiet === true) {
   console.log('Quiet mode enabled');
 }
 
-var keepAlive = setInterval(async function() {
+const keepAlive = setInterval(async () => {
   try {
     console.log('Keep alive request - stats.js');
     console.log(await web3.eth.getNodeInfo());
-  } catch(error) {
+  } catch (error) {
     console.log('Error in keep alive ws request. Reconnecting to node - stats.js');
-    web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort.toString()}`));
+    web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
   }
 }, 60 * 1000);
 

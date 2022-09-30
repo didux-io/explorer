@@ -10,6 +10,7 @@ const web3explorer = require('web3-explorer');
 const asyncL = require('async');
 // const BigNumber = require('bignumber.js');
 const mongoose = require('mongoose');
+const local = require("../config.json");
 
 const Account = mongoose.model('Account');
 const Transaction = mongoose.model('Transaction');
@@ -21,21 +22,27 @@ const ADDRESS_CACHE_MAX = 10000; // address cache threshold
 /**
  * Start config for node connection and sync
  */
-const config = { nodeAddr: 'localhost', 'wsPort': 8546 };
-// load the config.json file
+// load config.json
+const config = { bulkSize: 100 };
 try {
-  const loaded = require('../config.json');
-  _.extend(config, loaded);
+  const local = require('../config.json');
+  _.extend(config, local);
   console.log('config.json found.');
 } catch (error) {
-  console.log('No config file found.');
-  throw error;
+  console.log('Error:', error);
   process.exit(1);
 }
 
-console.log(`Connecting ${config.nodeAddr}:${config.wsPort}...`);
+if (!config.nodeAddr && config.nodes) {
+  config.nodeAddr = config.nodes[Math.floor(Math.random() * config.nodes.length)];
+} else {
+  console.error('No node configured');
+  process.exit(1);
+}
+
+console.log(`Connecting ${config.nodeAddr}...`);
 // Sets address for RPC WEB3 to connect to, usually your node IP address defaults ot localhost
-const web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort.toString()}`));
+const web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
 
 if (web3.eth.net.isListening()) console.log('richlist - Web3 connection established');
 else throw 'richlist - No connection, please specify web3host in conf.json';

@@ -4,9 +4,8 @@
     Endpoint for client interface with ERC-20 tokens
 */
 
-const { eth } = require('./web3relay');
-
 const BigNumber = require('bignumber.js');
+const { eth } = require('./web3relay');
 
 const etherUnits = require(`${__lib}etherUnits.js`);
 

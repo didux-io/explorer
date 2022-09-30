@@ -2,29 +2,30 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-var Block = new Schema(
-{
-    "number": {type: Number, index: {unique: true}},
-    "hash": String,
-    "parentHash": String,
-    "nonce": String,
-    "sha3Uncles": String,
-    "logsBloom": String,
-    "transactionsRoot": String,
-    "stateRoot": String,
-    "receiptRoot": String,
-    "miner": String,
-    "difficulty": String,
-    "totalDifficulty": String,
-    "size": Number,
-    "extraData": String,
-    "gasLimit": Number,
-    "gasUsed": Number,
-    "timestamp": Number,
-    "uncles": [String],
-    "txCount": Number,
-    "blockReward": Number
-});
+const Block = new Schema(
+  {
+    'number': { type: Number, index: { unique: true } },
+    'hash': String,
+    'parentHash': String,
+    'nonce': String,
+    'sha3Uncles': String,
+    'logsBloom': String,
+    'transactionsRoot': String,
+    'stateRoot': String,
+    'receiptRoot': String,
+    'miner': String,
+    'difficulty': String,
+    'totalDifficulty': String,
+    'size': Number,
+    'extraData': String,
+    'gasLimit': Number,
+    'gasUsed': Number,
+    'timestamp': Number,
+    'uncles': [String],
+    'txCount': Number,
+    'blockReward': Number,
+  },
+);
 
 const Account = new Schema(
   {
@@ -96,12 +97,12 @@ const InternalTransaction = new Schema(
   }, { collection: 'InternalTransaction' },
 );
 
-var MinedBlocksCount = new Schema(
+const MinedBlocksCount = new Schema(
   {
-    "type": String,
-    "amount": Number,
-    "address": {type: String, index: {unique: true}}
-  }, { collection: 'MinedBlocksCount' }
+    'type': String,
+    'amount': Number,
+    'address': { type: String, index: { unique: true } },
+  }, { collection: 'MinedBlocksCount' },
 );
 
 const TokenTransfer = new Schema(

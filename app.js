@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require( './db' );
+require('./db');
 
 const express = require('express');
 const path = require('path');
@@ -13,13 +13,15 @@ let config = {};
 try {
   config = require('./config.json');
 } catch (e) {
-  if (e.code == 'MODULE_NOT_FOUND') {
-    console.log('No config file found. Using default configuration... (config.example.json)');
-    config = require('./config.example.json');
-  } else {
-    throw e;
-    process.exit(1);
-  }
+  console.error('Error:', error);
+  process.exit(1);
+}
+
+if (!config.nodeAddr && config.nodes) {
+  config.nodeAddr = config.nodes[Math.floor(Math.random() * config.nodes.length)];
+} else {
+  console.error('No node configured');
+  process.exit(1);
 }
 
 const app = express();
@@ -34,94 +36,95 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors({credentials: false, origin: true}));
+app.use(cors({ credentials: false, origin: true }));
 
 console.log('Using configuration:');
 console.log(config);
 
-let Web3 = require('web3');
-let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
+const Web3 = require('web3');
 
-let mongoose = require('mongoose');
+let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
+
+const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
-let BlockStats = mongoose.model('BlockStat');
-let MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
-app.get("/stats", async function (req, res) {
-  let blockStats = await BlockStats.find({});
+const BlockStats = mongoose.model('BlockStat');
+const MinedBlocksCount = mongoose.model('MinedBlocksCount');
+
+app.get('/stats', async (req, res) => {
+  const blockStats = await BlockStats.find({});
   let totalAverageTime = 0;
   let amountOfBlocksProcessed = 0;
-  blockStats.forEach(blockStat => {
-      totalAverageTime += blockStat.blockTime;
-      amountOfBlocksProcessed++;
+  blockStats.forEach((blockStat) => {
+    totalAverageTime += blockStat.blockTime;
+    amountOfBlocksProcessed++;
   });
-  let averageBlockTimeInSec = totalAverageTime / amountOfBlocksProcessed;
-  let latestBlockObj = await web3.eth.getBlock("latest");
-  let latestBlockNumber = latestBlockObj.number;
-  let totalXsmCreated = getTotalXsmCreated(latestBlockNumber);
+  const averageBlockTimeInSec = totalAverageTime / amountOfBlocksProcessed;
+  const latestBlockObj = await web3.eth.getBlock('latest');
+  const latestBlockNumber = latestBlockObj.number;
+  const totalXsmCreated = getTotalXsmCreated(latestBlockNumber);
 
-  let minedBlocksCountResult = await MinedBlocksCount.findOne({type: "global"});
+  const minedBlocksCountResult = await MinedBlocksCount.findOne({ type: 'global' });
 
-  let gasPrice = await web3.eth.getGasPrice();
+  const gasPrice = await web3.eth.getGasPrice();
 
   res.send({
-      lastBlock: latestBlockNumber,
-      current_supply: totalXsmCreated,
-      totalTransactions: minedBlocksCountResult ? minedBlocksCountResult.amount : 0,
-      averageBlockTimeInSecLast1000Blocks: isNaN(averageBlockTimeInSec) ? "-1" : averageBlockTimeInSec.toFixed(2),
-      gasPrice: gasPrice
+    lastBlock: latestBlockNumber,
+    current_supply: totalXsmCreated,
+    totalTransactions: minedBlocksCountResult ? minedBlocksCountResult.amount : 0,
+    averageBlockTimeInSecLast1000Blocks: isNaN(averageBlockTimeInSec) ? '-1' : averageBlockTimeInSec.toFixed(2),
+    gasPrice,
   });
 });
 
-var keepAlive = setInterval(async function() {
-    try {
-      console.log('Keep alive request - app.js');
-      console.log(await web3.eth.getNodeInfo());
-    } catch(error) {
-      console.log('Error in keep alive ws request. Reconnecting to node - app.js');
-      web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
-    }
+const keepAlive = setInterval(async () => {
+  try {
+    console.log('Keep alive request - app.js');
+    console.log(await web3.eth.getNodeInfo());
+  } catch (error) {
+    console.log('Error in keep alive ws request. Reconnecting to node - app.js');
+    web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
+  }
 }, 60 * 1000);
 
 // https://github.com/Smilo-platform/Wiki/wiki/Masternode-block-reward
 function getTotalXsmCreated(totalBlocks) {
-    if(totalBlocks >= 3200000000)
-        totalBlocks = 3200000000;
+  if (totalBlocks >= 3200000000) totalBlocks = 3200000000;
 
-    let increments = [{ blocks: 1,   reward: 4 },
-    { blocks: 20000001,   reward: 2 },
-    { blocks: 40000001,   reward: 1.75 },
-    { blocks: 60000001,   reward: 1.5 },
-    { blocks: 80000001,  reward: 1.25 },
-    { blocks: 100000001,  reward: 1.0 },
-    { blocks: 120000001,  reward: 0.8 },
-    { blocks: 140000001,  reward: 0.6 },
-    { blocks: 160000001,  reward: 0.4 },
-    { blocks: 180000001,  reward: 0.2 },
-    { blocks: 200000001,  reward: 0.1 },
-    { blocks: 400000001,  reward: 0.05 },
+  const increments = [{ blocks: 1, reward: 4 },
+    { blocks: 20000001, reward: 2 },
+    { blocks: 40000001, reward: 1.75 },
+    { blocks: 60000001, reward: 1.5 },
+    { blocks: 80000001, reward: 1.25 },
+    { blocks: 100000001, reward: 1.0 },
+    { blocks: 120000001, reward: 0.8 },
+    { blocks: 140000001, reward: 0.6 },
+    { blocks: 160000001, reward: 0.4 },
+    { blocks: 180000001, reward: 0.2 },
+    { blocks: 200000001, reward: 0.1 },
+    { blocks: 400000001, reward: 0.05 },
     { blocks: 800000001, reward: 0.025 },
     { blocks: 1600000001, reward: 0.0125 }];
 
-    let totalXsmCreated = increments.reverse().reduce((previous, increment) => {
-        let reward = 0;
-        let blocks = previous.blocks;
-        if (previous.blocks >= increment.blocks) {
-            let blocksInSection = previous.blocks - (increment.blocks - 1);
-            reward = blocksInSection * increment.reward;
-            blocks = increment.blocks - 1;
-        }
+  const totalXsmCreated = increments.reverse().reduce((previous, increment) => {
+    let reward = 0;
+    let { blocks } = previous;
+    if (previous.blocks >= increment.blocks) {
+      const blocksInSection = previous.blocks - (increment.blocks - 1);
+      reward = blocksInSection * increment.reward;
+      blocks = increment.blocks - 1;
+    }
 
-        return {
-            reward: previous.reward + reward,
-            blocks: blocks
-        }
-    }, {reward: 0, blocks: totalBlocks});
+    return {
+      reward: previous.reward + reward,
+      blocks,
+    };
+  }, { reward: 0, blocks: totalBlocks });
 
-    // Increment calculation with pre-mined Foundation tokens
-    totalXsmCreated.reward += 80000000;
+  // Increment calculation with pre-mined Foundation tokens
+  totalXsmCreated.reward += 80000000;
 
-    return totalXsmCreated.reward;
+  return totalXsmCreated.reward;
 }
 
 global.__lib = `${__dirname}/lib/`;

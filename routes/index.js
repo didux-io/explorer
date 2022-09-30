@@ -113,7 +113,7 @@ const getInternalAddr = async (req, res) => {
 };
 const getInternalAddrOnBlockHash = async (req, res) => {
   console.log('getInternalAddrOnBlockHash');
-  const blockHash = req.body.blockHash;
+  const { blockHash } = req.body;
   console.log('get hash on:', blockHash);
 
   const addrFind = await InternalTransaction.find({ 'blockHash': blockHash });
@@ -144,8 +144,8 @@ var getAddrCounter = function (req, res) {
       });
 
     }], (err) => {
-      res.write(JSON.stringify(data));
-      res.end();
+    res.write(JSON.stringify(data));
+    res.end();
   });
 };
 var getInternalAddrCounter = function (req, res) {
@@ -168,16 +168,16 @@ var getInternalAddrCounter = function (req, res) {
         callback(null);
       });
     }], (err) => {
-      res.write(JSON.stringify(data));
-      res.end();
+    res.write(JSON.stringify(data));
+    res.end();
   });
 };
-var getMinedBlockCount = async function(req, res) {
+var getMinedBlockCount = async function (req, res) {
   console.log('getMinedBlockCount');
-  let addr = req.query.addr;
+  const { addr } = req.query;
   console.log('getMinedBlockCount addr:', addr);
   let minedBlockCount = 0;
-  let minedBlockObj = await MinedBlocksCount.findOne({address: addr});
+  const minedBlockObj = await MinedBlocksCount.findOne({ address: addr });
   console.log('getMinedBlockCount - minedBlockObj:', minedBlockObj);
   if (minedBlockObj) {
     console.log('getMinedBlockCount - YES IF');
@@ -188,48 +188,46 @@ var getMinedBlockCount = async function(req, res) {
   res.write(JSON.stringify(minedBlockCount));
   res.end();
 };
-var getContractDetails = async function(req, res) {
-  let addr = req.query.addr;
-  let contractObj = await Contract.findOne({address: addr});
-  let owner = "";
-  let creationTransaction = "";
+var getContractDetails = async function (req, res) {
+  const { addr } = req.query;
+  const contractObj = await Contract.findOne({ address: addr });
+  let owner = '';
+  let creationTransaction = '';
   if (contractObj) {
     owner = contractObj.owner;
     creationTransaction = contractObj.creationTransaction;
   }
-  res.write(JSON.stringify({owner: owner, creationTransaction: creationTransaction}));
+  res.write(JSON.stringify({ owner, creationTransaction }));
   res.end();
-}
-var getMinedBlocks = async function(req, res) {
+};
+var getMinedBlocks = async function (req, res) {
   console.log('getMinedBlocks');
-  let addr = req.body.addr;
-  var count = parseInt(req.body.count);
+  const { addr } = req.body;
+  const count = parseInt(req.body.count);
 
-  var data = { draw: parseInt(req.body.draw), recordsFiltered: count, recordsTotal: count };
+  const data = { draw: parseInt(req.body.draw), recordsFiltered: count, recordsTotal: count };
 
   console.log('getMinedBlocks start query');
-  let minedBlocks = Block.find({miner: addr})
+  const minedBlocks = Block.find({ miner: addr });
   // .sort({timestamp: -1});
   console.log('getMinedBlocks end query');
 
-  var limit = parseInt(req.body.length);
-  var start = parseInt(req.body.start);
+  const limit = parseInt(req.body.length);
+  const start = parseInt(req.body.start);
 
   console.log('getMinedBlocks start lean');
   minedBlocks.lean(true)
-              .skip(start)
-              .limit(limit)
-              .sort({timestamp: -1})
-              .exec("find", function (err, docs) {
-                if (docs)
-                  data.data = filters.filterMinedBlock(docs, addr);      
-                else 
-                  data.data = [];
-                
-                console.log('getMinedBlocks end lean');
-                res.write(JSON.stringify(data));
-                res.end();
-            });
+    .skip(start)
+    .limit(limit)
+    .sort({ timestamp: -1 })
+    .exec('find', (err, docs) => {
+      if (docs) data.data = filters.filterMinedBlock(docs, addr);
+      else data.data = [];
+
+      console.log('getMinedBlocks end lean');
+      res.write(JSON.stringify(data));
+      res.end();
+    });
 };
 var getBlock = function (req, res) {
   // TODO: support queries for block hash

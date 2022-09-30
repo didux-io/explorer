@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-var fs = require("fs");
+const fs = require('fs');
 
 /*
     Endpoint for client to talk to etc node
 */
 
-let Web3 = require('web3');
+const Web3 = require('web3');
 const web3explorer = require('web3-explorer');
 
 let web3;
@@ -45,8 +45,8 @@ try {
 }
 
 //Create Web3 connection
-console.log(`Connecting ${config.nodeAddr}:${config.wsPort}...`);
-web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
+console.log(`Connecting ${config.nodeAddr}...`);
+web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
 
 if (web3.eth.net.isListening()) console.log('Web3 connection established');
 else throw 'No connection, please specify web3host in conf.json';
@@ -62,14 +62,14 @@ async function detectNode() {
 }
 detectNode();
 
-var keepAlive = setInterval(async function() {
-    try {
-      console.log('Keep alive request - web3relay.js');
-      console.log(await web3.eth.getNodeInfo());
-    } catch(error) {
-      console.log('Error in keep alive ws request. Reconnecting to node - web3relay.js');
-      web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort}`));
-    }
+const keepAlive = setInterval(async () => {
+  try {
+    console.log('Keep alive request - web3relay.js');
+    console.log(await web3.eth.getNodeInfo());
+  } catch (error) {
+    console.log('Error in keep alive ws request. Reconnecting to node - web3relay.js');
+    web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
+  }
 }, 300 * 1000);
 
 exports.data = async (req, res) => {
@@ -132,24 +132,24 @@ exports.data = async (req, res) => {
 
       const latestBlock = await web3.eth.getBlockNumber() + 1;
 
-      if (txResponse != null){
-          txResponse.confirmations = latestBlock - txResponse.blockNumber;
+      if (txResponse != null) {
+        txResponse.confirmations = latestBlock - txResponse.blockNumber;
 
-          if (txResponse.confirmations === latestBlock) {
-              txResponse.confirmation = 0;
-          }
-          txResponse.gasPriceGwei = etherUnits.toGwei(new BigNumber(txResponse.gasPrice), 'wei');
-          txResponse.gasPriceEther = etherUnits.toEther(new BigNumber(txResponse.gasPrice), 'wei');
-          txResponse.txFee = txResponse.gasPriceEther * txResponse.gasUsed;
+        if (txResponse.confirmations === latestBlock) {
+          txResponse.confirmation = 0;
+        }
+        txResponse.gasPriceGwei = etherUnits.toGwei(new BigNumber(txResponse.gasPrice), 'wei');
+        txResponse.gasPriceEther = etherUnits.toEther(new BigNumber(txResponse.gasPrice), 'wei');
+        txResponse.txFee = txResponse.gasPriceEther * txResponse.gasUsed;
 
-          if (config.settings.useFiat) {
-              const latestPrice = await Market.findOne().sort({ timestamp: -1 });
-              txResponse.txFeeUSD = txResponse.txFee * latestPrice.quoteUSD;
-              txResponse.valueUSD = txResponse.value * latestPrice.quoteUSD;
-          }
+        if (config.settings.useFiat) {
+          const latestPrice = await Market.findOne().sort({ timestamp: -1 });
+          txResponse.txFeeUSD = txResponse.txFee * latestPrice.quoteUSD;
+          txResponse.valueUSD = txResponse.value * latestPrice.quoteUSD;
+        }
 
-          res.write(JSON.stringify(txResponse));
-          res.end();
+        res.write(JSON.stringify(txResponse));
+        res.end();
       }
     });
 

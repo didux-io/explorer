@@ -19,6 +19,7 @@ const abiDecoder = require('abi-decoder');
 const mongoose = require('mongoose');
 const etherUnits = require('../lib/etherUnits.js');
 const { Market } = require('../db.js');
+const local = require("../config.json");
 
 const Block = mongoose.model('Block');
 const Transaction = mongoose.model('Transaction');
@@ -35,29 +36,29 @@ const ERC20_METHOD_DIC = { '0xa9059cbb': 'transfer', '0xa978501e': 'transferFrom
 **/
 /**
  * nodeAddr: node address
- * wsPort:  rpc port
  * bulkSize: size of array in block to use bulk operation
  */
 // load config.json
-const config = { nodeAddr: 'localhost', wsPort: 8546, bulkSize: 100 };
+const config = { bulkSize: 100 };
 try {
-  var local = require('../config.json');
+  const local = require('../config.json');
   _.extend(config, local);
   console.log('config.json found.');
 } catch (error) {
-  if (error.code === 'MODULE_NOT_FOUND') {
-    var local = require('../config.example.json');
-    _.extend(config, local);
-    console.log('No config file found. Using default configuration... (config.example.json)');
-  } else {
-    throw error;
-    process.exit(1);
-  }
+  console.log('Error:', error);
+  process.exit(1);
 }
 
-console.log(`Connecting ${config.nodeAddr}:${config.wsPort}...`);
+if (!config.nodeAddr && config.nodes) {
+  config.nodeAddr = config.nodes[Math.floor(Math.random() * config.nodes.length)];
+} else {
+  console.error('No node configured');
+  process.exit(1);
+}
+
+console.log(`Connecting ${config.nodeAddr}...`);
 // Sets address for RPC WEB3 to connect to, usually your node IP address defaults ot localhost
-let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort.toString()}`));
+let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
 if (web3.eth.net.isListening()) console.log('sync - Web3 connection established');
 else throw 'sync - No connection, please specify web3host in conf.json';
 
@@ -87,13 +88,13 @@ const normalizeTX = async (txData, receipt, blockData) => {
   if (txData.to) {
     tx.to = txData.to.toLowerCase();
     return tx;
-  } else if (txData.creates) {
+  } if (txData.creates) {
     tx.creates = txData.creates.toLowerCase();
     return tx;
-  } else {
-    tx.creates = receipt.contractAddress.toLowerCase();
-    return tx;
   }
+  tx.creates = receipt.contractAddress.toLowerCase();
+  return tx;
+
 };
 
 /**
@@ -114,25 +115,25 @@ var writeBlockToDB = function (config, blockData, flush) {
       console.log(`\t- block #${blockData.number.toString()} inserted.`);
     }
     MinedBlocksCount.findOneAndUpdate(
-        {   // Filter
-            address: blockData.miner
-        }, 
-        {   // Update
-            $inc: {
-                amount: 1
-            },
-            type: "address"
+      { // Filter
+        address: blockData.miner,
+      },
+      { // Update
+        $inc: {
+          amount: 1,
         },
-        {   // Options
-            upsert: true,
-            new: true
-        },  
-        (   // Callback
-            err, 
-            tx
-        ) => { // Return
-            
-        }
+        type: 'address',
+      },
+      { // Options
+        upsert: true,
+        new: true,
+      },
+      ( // Callback
+        err,
+        tx,
+      ) => { // Return
+
+      },
     );
   }
 
@@ -159,37 +160,37 @@ var writeBlockToDB = function (config, blockData, flush) {
     });
   }
 };
-let getBlockReward = function(b) {
+let getBlockReward = function (b) {
   if (b > 0 && b < 20000001) {
-      return 4;
-  } else if (b > 20000000 && b < 40000001) {
-      return 2;
-  } else if (b > 40000000 && b < 60000001) {
-      return 1.75;
-  } else if (b > 60000000 && b < 80000001) {
-      return 1.5;
-  } else if (b > 80000000 && b < 100000001) {
-      return 1.25;
-  } else if (b > 100000000 && b < 120000001) {
-      return 1.0;
-  } else if (b > 120000000 && b < 140000001) {
-      return 0.8;
-  } else if (b > 140000000 && b < 160000001) {
-      return 0.6;
-  } else if (b > 160000000 && b < 180000001) {
-      return 0.4;
-  } else if (b > 180000000 && b < 200000001) {
-      return 0.2;
-  } else if (b > 200000000 && b < 400000001) {
-      return 0.1;
-  } else if (b > 400000000 && b < 800000001) {
-      return 0.05;
-  } else if (b > 800000000 && b < 1600000001) {
-      return 0.025;
-  } else if (b > 1600000000 && b < 3200000001) {
-      return 0.0125;
-  } 
-}
+    return 4;
+  } if (b > 20000000 && b < 40000001) {
+    return 2;
+  } if (b > 40000000 && b < 60000001) {
+    return 1.75;
+  } if (b > 60000000 && b < 80000001) {
+    return 1.5;
+  } if (b > 80000000 && b < 100000001) {
+    return 1.25;
+  } if (b > 100000000 && b < 120000001) {
+    return 1.0;
+  } if (b > 120000000 && b < 140000001) {
+    return 0.8;
+  } if (b > 140000000 && b < 160000001) {
+    return 0.6;
+  } if (b > 160000000 && b < 180000001) {
+    return 0.4;
+  } if (b > 180000000 && b < 200000001) {
+    return 0.2;
+  } if (b > 200000000 && b < 400000001) {
+    return 0.1;
+  } if (b > 400000000 && b < 800000001) {
+    return 0.05;
+  } if (b > 800000000 && b < 1600000001) {
+    return 0.025;
+  } if (b > 1600000000 && b < 3200000001) {
+    return 0.0125;
+  }
+};
 /**
   Break transactions out of blocks and write to DB
 **/
@@ -462,24 +463,24 @@ const writeTransactionsToDB = async (config, blockData, flush) => {
         }
       });
       MinedBlocksCount.findOneAndUpdate(
-        {   // Filter
-            type: "global"
-        }, 
-        {   // Update
-            $inc: {
-                amount: bulk.length
-            }
+        { // Filter
+          type: 'global',
         },
-        {   // Options
-            upsert: true,
-            new: true
-        },  
-        (   // Callback
-            err, 
-            tx
+        { // Update
+          $inc: {
+            amount: bulk.length,
+          },
+        },
+        { // Options
+          upsert: true,
+          new: true,
+        },
+        ( // Callback
+          err,
+          tx,
         ) => { // Return
-            
-        }
+
+        },
       );
     }
   }
@@ -739,21 +740,19 @@ listenBlocks(config);
 const input = '0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c40000000000000000000000002ec3a912b3815c676064fb823bcf0c584809eda2000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000031f5c4ed27680000000000000000000000000000000000000000000000000000214e8348c4f00000';
 
 // Two players
-const input2 ='0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000020000000000000000000000002ec3a912b3815c676064fb823bcf0c584809eda2000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c4000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000031f5c4ed27680000000000000000000000000000000000000000000000000000214e8348c4f00000';
+const input2 = '0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000020000000000000000000000002ec3a912b3815c676064fb823bcf0c584809eda2000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c4000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000031f5c4ed27680000000000000000000000000000000000000000000000000000214e8348c4f00000';
 
 // One player
-const input3 ='0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c4000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000053444835ec580000';
+const input3 = '0xad544c30000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000577db2f2e42388109be8fb2048b2c339cb79a6c4000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000053444835ec580000';
 
 // 0xad544c3
 // 000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000002000000000000000000000000
-
 
 // Start at: 226
 // 577db2f2e42388109be8fb2048b2c339cb79a6c4
 // 000000000000000000000000
 // 2ec3a912b3815c676064fb823bcf0c584809eda2
 // 0000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000
-
 
 // 31f5c4ed27680000
 // 000000000000000000000000000000000000000000000000
@@ -774,248 +773,248 @@ if (config.settings.useFiat) {
   }, quoteInterval);
 }
 
-var keepAlive = setInterval(async function() {
-    try {
-      console.log('Keep alive request - sync.js');
-      console.log(await web3.eth.getNodeInfo());
-    } catch(error) {
-      console.log('Error in keep alive ws request. Reconnecting to node - sync.js');
-      web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}:${config.wsPort.toString()}`));
-      listenBlocks(config);
-    }
+const keepAlive = setInterval(async () => {
+  try {
+    console.log('Keep alive request - sync.js');
+    console.log(await web3.eth.getNodeInfo());
+  } catch (error) {
+    console.log('Error in keep alive ws request. Reconnecting to node - sync.js');
+    web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
+    listenBlocks(config);
+  }
 }, 60 * 1000);
 
 // Didux Quake contract ABI
 const abi = [
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getGameDetails",
-		"outputs": [
-			{
-				"name": "",
-				"type": "string"
-			},
-			{
-				"name": "",
-				"type": "int256"
-			},
-			{
-				"name": "",
-				"type": "int256"
-			},
-			{
-				"name": "",
-				"type": "int256"
-			},
-			{
-				"name": "",
-				"type": "int256"
-			},
-			{
-				"name": "",
-				"type": "int256"
-			},
-			{
-				"name": "",
-				"type": "int256"
-			},
-			{
-				"name": "",
-				"type": "int256"
-			},
-			{
-				"name": "",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "contractName",
-				"type": "string"
-			},
-			{
-				"name": "deposit",
-				"type": "int256"
-			},
-			{
-				"name": "minimalParticipants",
-				"type": "int256"
-			},
-			{
-				"name": "firstReward",
-				"type": "int256"
-			},
-			{
-				"name": "secondReward",
-				"type": "int256"
-			},
-			{
-				"name": "thirdReward",
-				"type": "int256"
-			},
-			{
-				"name": "serverReward",
-				"type": "int256"
-			},
-			{
-				"name": "rewardType",
-				"type": "string"
-			}
-		],
-		"name": "setGameDetails",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "winnersAddresses",
-				"type": "address[]"
-			},
-			{
-				"name": "winnersAmounts",
-				"type": "uint256[]"
-			}
-		],
-		"name": "endRound",
-		"outputs": [],
-		"payable": true,
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "participantAddress",
-				"type": "address"
-			}
-		],
-		"name": "isValidParticipant",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "participantAddress",
-				"type": "address"
-			}
-		],
-		"name": "addParticipant",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "amountOfParticipants",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"name": "contractName",
-				"type": "string"
-			},
-			{
-				"name": "deposit",
-				"type": "int256"
-			},
-			{
-				"name": "minimalParticipants",
-				"type": "int256"
-			},
-			{
-				"name": "firstReward",
-				"type": "int256"
-			},
-			{
-				"name": "secondReward",
-				"type": "int256"
-			},
-			{
-				"name": "thirdReward",
-				"type": "int256"
-			},
-			{
-				"name": "serverReward",
-				"type": "int256"
-			},
-			{
-				"name": "rewardType",
-				"type": "string"
-			}
-		],
-		"payable": true,
-		"stateMutability": "payable",
-		"type": "constructor"
-	},
-	{
-		"payable": true,
-		"stateMutability": "payable",
-		"type": "fallback"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "winnersAddresses",
-				"type": "address[]"
-			},
-			{
-				"indexed": false,
-				"name": "winnersAmounts",
-				"type": "uint256[]"
-			}
-		],
-		"name": "WinnersSummary",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "ContractReceivedFunds",
-		"type": "event"
-	}
+  {
+    'constant': true,
+    'inputs': [],
+    'name': 'getGameDetails',
+    'outputs': [
+      {
+        'name': '',
+        'type': 'string',
+      },
+      {
+        'name': '',
+        'type': 'int256',
+      },
+      {
+        'name': '',
+        'type': 'int256',
+      },
+      {
+        'name': '',
+        'type': 'int256',
+      },
+      {
+        'name': '',
+        'type': 'int256',
+      },
+      {
+        'name': '',
+        'type': 'int256',
+      },
+      {
+        'name': '',
+        'type': 'int256',
+      },
+      {
+        'name': '',
+        'type': 'int256',
+      },
+      {
+        'name': '',
+        'type': 'string',
+      },
+    ],
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function',
+  },
+  {
+    'constant': false,
+    'inputs': [
+      {
+        'name': 'contractName',
+        'type': 'string',
+      },
+      {
+        'name': 'deposit',
+        'type': 'int256',
+      },
+      {
+        'name': 'minimalParticipants',
+        'type': 'int256',
+      },
+      {
+        'name': 'firstReward',
+        'type': 'int256',
+      },
+      {
+        'name': 'secondReward',
+        'type': 'int256',
+      },
+      {
+        'name': 'thirdReward',
+        'type': 'int256',
+      },
+      {
+        'name': 'serverReward',
+        'type': 'int256',
+      },
+      {
+        'name': 'rewardType',
+        'type': 'string',
+      },
+    ],
+    'name': 'setGameDetails',
+    'outputs': [],
+    'payable': false,
+    'stateMutability': 'nonpayable',
+    'type': 'function',
+  },
+  {
+    'constant': false,
+    'inputs': [
+      {
+        'name': 'winnersAddresses',
+        'type': 'address[]',
+      },
+      {
+        'name': 'winnersAmounts',
+        'type': 'uint256[]',
+      },
+    ],
+    'name': 'endRound',
+    'outputs': [],
+    'payable': true,
+    'stateMutability': 'payable',
+    'type': 'function',
+  },
+  {
+    'constant': true,
+    'inputs': [
+      {
+        'name': 'participantAddress',
+        'type': 'address',
+      },
+    ],
+    'name': 'isValidParticipant',
+    'outputs': [
+      {
+        'name': '',
+        'type': 'bool',
+      },
+    ],
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function',
+  },
+  {
+    'constant': false,
+    'inputs': [
+      {
+        'name': 'participantAddress',
+        'type': 'address',
+      },
+    ],
+    'name': 'addParticipant',
+    'outputs': [],
+    'payable': false,
+    'stateMutability': 'nonpayable',
+    'type': 'function',
+  },
+  {
+    'constant': true,
+    'inputs': [],
+    'name': 'amountOfParticipants',
+    'outputs': [
+      {
+        'name': '',
+        'type': 'uint256',
+      },
+    ],
+    'payable': false,
+    'stateMutability': 'view',
+    'type': 'function',
+  },
+  {
+    'inputs': [
+      {
+        'name': 'owner',
+        'type': 'address',
+      },
+      {
+        'name': 'contractName',
+        'type': 'string',
+      },
+      {
+        'name': 'deposit',
+        'type': 'int256',
+      },
+      {
+        'name': 'minimalParticipants',
+        'type': 'int256',
+      },
+      {
+        'name': 'firstReward',
+        'type': 'int256',
+      },
+      {
+        'name': 'secondReward',
+        'type': 'int256',
+      },
+      {
+        'name': 'thirdReward',
+        'type': 'int256',
+      },
+      {
+        'name': 'serverReward',
+        'type': 'int256',
+      },
+      {
+        'name': 'rewardType',
+        'type': 'string',
+      },
+    ],
+    'payable': true,
+    'stateMutability': 'payable',
+    'type': 'constructor',
+  },
+  {
+    'payable': true,
+    'stateMutability': 'payable',
+    'type': 'fallback',
+  },
+  {
+    'anonymous': false,
+    'inputs': [
+      {
+        'indexed': false,
+        'name': 'winnersAddresses',
+        'type': 'address[]',
+      },
+      {
+        'indexed': false,
+        'name': 'winnersAmounts',
+        'type': 'uint256[]',
+      },
+    ],
+    'name': 'WinnersSummary',
+    'type': 'event',
+  },
+  {
+    'anonymous': false,
+    'inputs': [
+      {
+        'indexed': false,
+        'name': 'amount',
+        'type': 'uint256',
+      },
+    ],
+    'name': 'ContractReceivedFunds',
+    'type': 'event',
+  },
 ];
 abiDecoder.addABI(abi);
