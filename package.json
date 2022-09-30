@@ -1,9 +1,9 @@
 {
-  "name": "smilo-block-explorer",
+  "name": "block-explorer",
   "private": false,
   "version": "0.1.0",
-  "description": "A lightweight Smilo block explorer",
-  "repository": "https://github.com/Smilo-platform/Smilo-Explorer",
+  "description": "A lightweight Didux block explorer",
+  "repository": "https://github.com/didux-io/Explorer",
   "license": "MIT",
   "scripts": {
     "start": "concurrently \"node tools/sync.js \" \"node app.js\" ",
@@ -34,7 +34,7 @@
     "scrypt": "github:barrysteyn/node-scrypt#fb60a8d3c158fe115a624b5ffa7480f3a24b03fb",
     "serve-favicon": "~2.5.0",
     "solc": "^0.5.6",
-    "web3": "^1.0.0-beta.37",
+    "web3": "1.8.0",
     "web3-explorer": "1.0.2",
     "websocket": "^1.0.28"
   },

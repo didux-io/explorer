@@ -1,0 +1,56 @@
+name: Build and push branch
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  testBuildAndPush:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: run config
+        run: |
+          echo "Build ${{ github.event.ref }}"
+          branch="${{ github.event.ref }}"
+          prefix="refs/heads/"
+          echo "Prefix is: $prefix"
+          branch_without_prefix=${branch/#$prefix}
+          echo "branch_without_prefix is: $branch_without_prefix"
+          tag=${branch_without_prefix//\//_}
+          tag_lowercase=$(echo $tag | tr '[:upper:]' '[:lower:]')
+          echo "Tag is: $tag_lowercase"
+          repo=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          echo "REPO is: $repo"
+          version="{ \"VERSION\": \"$(date +%Y%m%dT%H%M)\", \"BRANCH\": \"$tag_lowercase\", \"SERVICE\": \"$repo\" }"
+          echo "VERSION is: $version"
+          echo IMAGE_TAG=$tag_lowercase >> $GITHUB_ENV
+          echo VERSIONING=$version >> $GITHUB_ENV
+          echo IMAGE_REPOSITORY=$repo >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "version.json"
+          json: ${{ env.VERSIONING }}
+          dir: 'src/assets'
+      - uses: kciter/aws-ecr-action@v1
+        with:
+          access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          account_id: ${{ secrets.AWS_ACCOUNT_ID }}
+          repo: ${{ env.IMAGE_REPOSITORY }}
+          region: ${{ secrets.AWS_REGION }}
+          tags: ${{ env.IMAGE_TAG }}
+          create_repo: true
+        env:
+          CI: true
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow # selectable (default: repo,message)
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.

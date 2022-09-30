@@ -1,0 +1,40 @@
+name: Clean up feature files
+
+on:
+  delete:
+    branches:
+      - '**'
+      - '!main'
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: run config
+        run: |
+          echo "Deleting ${{ github.event.ref }}"
+          branch="${{ github.event.ref }}"
+          prefix="refs/heads/"
+          echo "Prefix is: $prefix"
+          branch_without_prefix=${branch/#$prefix}
+          echo "branch_without_prefix is: $branch_without_prefix"
+          tag=${branch_without_prefix//\//_}
+          tag_lowercase=$(echo $tag | tr '[:upper:]' '[:lower:]')
+          echo "Tag is: $tag_lowercase"
+          repo=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          echo "REPO is: $repo"
+          version="{ \"VERSION\": \"$(date +%Y%m%dT%H%M)\", \"BRANCH\": \"$tag_lowercase\", \"SERVICE\": \"$repo\" }"
+          echo "VERSION is: $version"
+          echo IMAGE_TAG=$tag_lowercase >> $GITHUB_ENV
+          echo VERSIONING=$version >> $GITHUB_ENV
+          echo IMAGE_REPOSITORY=$repo >> $GITHUB_ENV
+      - name: Clean up feature build files
+        uses: jabbukka/jenkins-trigger@main
+        with:
+          url: "https://build.didux.network"
+          user_name: "Elkan"
+          api_token: ${{ secrets.JENKINS_TOKEN }}
+          job_name: "clean-feature"
+          parameter: ${{ env.VERSIONING }}
+          wait: false

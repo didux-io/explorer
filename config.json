@@ -1,7 +1,7 @@
 {
-    "nodeAddr":     "wss://ws-eu.didux.network",
+    "nodeAddr":     "wss://ws.didux.network",
     "wsPort":       443,
-    "startBlock":   1287806,
+    "startBlock":   0,
     "endBlock":     "latest",
     "quiet":        true,
     "syncAll":      true,
@@ -11,7 +11,7 @@
     "settings": {
         "symbol": "XD",
         "name": "Didux.io",
-        "title": "Didux Platform Block Explorer",
+        "title": "Didux Block Explorer",
         "author": "Daniel, Elkan",
         "contact": "info@didux.io",
         "about": "This is the Didux Blockchain Explorer.",
