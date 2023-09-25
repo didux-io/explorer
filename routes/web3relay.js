@@ -81,11 +81,12 @@ exports.data = async (req, res) => {
 
     Transaction.findOne({ hash: txHash }).lean(true).exec(async (err, doc) => {
       if (err || !doc) {
-        web3.eth.getTransaction(txHash, (err, tx) => {
+        console.log("Transaction not found fetching from node")
+        await web3.eth.getTransaction(txHash, async (err, tx) => {
           if (err || !tx) {
             console.error(`TxWeb3 error :${err}`);
             if (!tx) {
-              web3.eth.getBlock(txHash, (err, block) => {
+              await web3.eth.getBlock(txHash, (err, block) => {
                 if (err || !block) {
                   console.error(`BlockWeb3 error :${err}`);
                   res.write(JSON.stringify({ 'error': true }));
@@ -109,6 +110,7 @@ exports.data = async (req, res) => {
                 return;
               }
               ttx.gasUsed = receipt.gasUsed;
+              // console.log(receipt);
               if (receipt.status) {
                 ttx.status = receipt.status;
               }
@@ -118,12 +120,7 @@ exports.data = async (req, res) => {
                 }
               }
             });
-            //get timestamp from block
-            const block = web3.eth.getBlock(tx.blockNumber, (err, block) => {
-              if (!err && block) ttx.timestamp = block.timestamp;
-              ttx.isTrace = (ttx.input != '0x');
-              txResponse = ttx;
-            });
+            txResponse = ttx;
           }
         });
       } else {
@@ -239,6 +236,7 @@ exports.data = async (req, res) => {
     Block.findOne({ $or: [{ hash: blockNumOrHash }, { number: blockNumOrHash }] },
       { '_id': 0 }).lean(true).exec('findOne', (err, doc) => {
       if (err || !doc) {
+        console.log("Block not in DB fetch from node.")
         web3.eth.getBlock(blockNumOrHash, (err, block) => {
           if (err || !block) {
             console.error(`BlockWeb3 error :${err}`);
