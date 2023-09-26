@@ -14,7 +14,6 @@ const ERC20ABI = require("human-standard-token-abi");
 
 const fetch = require("node-fetch");
 const abiDecoder = require("abi-decoder");
-const asyncL = require("async");
 
 const mongoose = require("mongoose");
 const etherUnits = require("../lib/etherUnits.js");
