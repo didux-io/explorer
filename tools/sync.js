@@ -107,44 +107,6 @@ const normalizeTX = async (txData, receipt, blockData) => {
     return tx;
 };
 
-/**
-  Write the whole block object to DB
-**/
-var writeBlockToDB = async function (blockData, session) {
-    try {
-        await Block.collection.insertOne(blockData, {
-            session,
-        });
-
-        // If we have no transactions in the block we will not trigger tx function.
-        // that means miner reward isnt stored, we need to store it.
-        if (blockData.transactions.length === 0) {
-            await Account.collection.updateOne(
-                { address: blockData.miner },
-                {
-                    $inc: {
-                        balance: getBlockReward(blockData.number),
-                    },
-                    $set: {
-                        address: blockData.miner,
-                        blockNumber: blockData.number,
-                    },
-                },
-                { upsert: true, session }
-            );
-        }
-    } catch (error) {
-        if (error.code === 11000) {
-            console.log(
-                `${blockData.number} was a duplicate block, skipping because it is already inserted.`
-            );
-        } else {
-            console.log(error);
-            throw new Error(`writeBlockToDB failed: ${blockData.number}`);
-        }
-    }
-};
-
 let getBlockReward = function (b) {
     if (b >= 0 && b < 20000001) {
         return 4;
@@ -201,7 +163,7 @@ const listenBlocks = function () {
         console.error(error);
     });
     newBlocks.on("data", async (blockHeader) => {
-        await handleBlockData(blockHeader.hash);
+        await fetchBlockFromChain(blockHeader.hash);
         await updateMinerMinedBlocks();
         await calculateTotalTransactions();
     });
@@ -237,7 +199,7 @@ var quickSync = async function (config, nextBlock) {
         // console.log(`Start ${config.bulkSize - runner} tasks`);
         for (let i = runner; i < config.bulkSize; i++) {
             runner++;
-            await handleBlockData(nextBlock);
+            await fetchBlockFromChain(nextBlock);
             nextBlock++;
         }
 
@@ -276,7 +238,7 @@ async function calculateTotalTransactions() {
     }
 }
 
-async function insertTxToDB(blockData) {
+async function parseBlockToDb(blockData) {
     try {
         // So we obviously have transaction(s).
         blockData.miner = blockData.miner?.toLowerCase();
@@ -285,62 +247,64 @@ async function insertTxToDB(blockData) {
         let contract;
         // let internalTxData;
 
-        for (const txData of blockData.transactions) {
+        if (blockData?.transactions?.length > 0) {
+            for (const txData of blockData.transactions) {
             // console.log(`Before Receipt:`);
             // console.log(`txData ahash:`, txData.hash);
-            const receipt = await httpWeb3.eth.getTransactionReceipt(txData.hash);
-            // console.log(`Receipt:`, receipt);
-            const tx = await normalizeTX(txData, receipt, blockData);
-            const accountData = {};
-            // Contact creation tx, Event logs of internal transaction
-            if (txData?.input?.length > 2) {
-                if (txData.to === null) {
-                    contract = await handleContractDeployment(
-                        blockData,
-                        txData,
-                        receipt
-                    );
-                } else {
-
-                    // @TODO: Internal TX handling 
-                    // internalTxData = await handleInternalTx(
-                    //     blockData,
-                    //     txData,
-                    //     tx
-                    // );
+                const receipt = await httpWeb3.eth.getTransactionReceipt(txData.hash);
+                // console.log(`Receipt:`, receipt);
+                const tx = await normalizeTX(txData, receipt, blockData);
+                const accountData = {};
+                // Contact creation tx, Event logs of internal transaction
+                if (txData?.input?.length > 2) {
+                    if (txData.to === null) {
+                        contract = await handleContractDeployment(
+                            blockData,
+                            txData,
+                            receipt
+                        );
+                    } else {
+    
+                        // @TODO: Internal TX handling 
+                        // internalTxData = await handleInternalTx(
+                        //     blockData,
+                        //     txData,
+                        //     tx
+                        // );
+                    }
                 }
-            }
-
-            if (tx.creates) {
-                accountData[tx.creates] = {
-                    address: tx.creates,
-                    blockNumber: tx.blockNumber,
-                    balance: Number(0 + tx.value),
-                    type: 1, // contract
-                };
-            }
-
-            accountData[tx.from] = {
-                address: tx.from,
-                blockNumber: tx.blockNumber,
-                balance: Number(0 - tx.value),
-            };
-
-            if (tx.to) {
-                accountData[tx.to] = {
-                    address: tx.to,
-                    blockNumber: tx.blockNumber,
-                    balance: Number(0 + tx.value),
-                };
-
-                // If you send to yourself nothing changes.
-                if (tx.to === tx.from) {
-                    accountData[tx.to].balance = accountData[tx.from].balance = 0;
+    
+                if (tx.creates) {
+                    accountData[tx.creates] = {
+                        address: tx.creates,
+                        blockNumber: tx.blockNumber,
+                        balance: Number(0 + tx.value),
+                        type: 1, // contract
+                    };
                 }
+    
+                accountData[tx.from] = {
+                    address: tx.from,
+                    blockNumber: tx.blockNumber,
+                    balance: Number(0 - tx.value),
+                };
+    
+                if (tx.to) {
+                    accountData[tx.to] = {
+                        address: tx.to,
+                        blockNumber: tx.blockNumber,
+                        balance: Number(0 + tx.value),
+                    };
+    
+                    // If you send to yourself nothing changes.
+                    if (tx.to === tx.from) {
+                        accountData[tx.to].balance = accountData[tx.from].balance = 0;
+                    }
+                }
+    
+                accountDataPerTransaction.push(accountData);
+                transactions.push(tx);
             }
-
-            accountDataPerTransaction.push(accountData);
-            transactions.push(tx);
         }
 
         // Add miner rewards
@@ -402,11 +366,14 @@ async function insertTxToDB(blockData) {
                 //         }
                 //     );
                 // }
-
-                await Transaction.collection.insertMany(transactions, {
+                if (blockData?.transactions?.length > 0) {
+                    await Transaction.collection.insertMany(transactions, {
+                        session,
+                    });
+                }
+                await Block.collection.insertOne(blockData, {
                     session,
                 });
-                await writeBlockToDB(blockData, session);
             });
             session.endSession();
         } catch (error) {
@@ -414,7 +381,7 @@ async function insertTxToDB(blockData) {
             console.log("Error occurred in storing in db.", error);
         }
     } catch (error) {
-        console.log("insertTxToDB failed:", error);
+        console.log("parseBlockToDb failed:", error);
     }
 }
 
@@ -569,11 +536,11 @@ async function handleContractDeployment(blockData, txData, receipt) {
     }
 }
 
-async function handleBlockData(block) {
+async function fetchBlockFromChain(block) {
     try {
         if (!block && block !== 0) {
             console.log(
-                "Thats weird, you can't call handleBlockData without a block number, or blockHeader.hash, you pancake."
+                "Thats weird, you can't call fetchBlockFromChain without a block number, or blockHeader.hash, you pancake."
                 );
                 runner--;
             } else {
@@ -589,12 +556,7 @@ async function handleBlockData(block) {
                     );
                 } else {
                     try {
-                        // console.log(`blockData.transactions:`, blockData.transactions.length);
-                        if (blockData?.transactions?.length > 0) {
-                            await insertTxToDB(blockData);
-                        } else {
-                            await writeBlockToDB(blockData, null);
-                        }
+                        await parseBlockToDb(blockData);
                     } catch (error) {
                         console.error("DB Block & TX Session error", error);
                     }
@@ -603,7 +565,7 @@ async function handleBlockData(block) {
             });
         }
     } catch (error) {
-        console.log("handleBlockData error - ", error);
+        console.log("fetchBlockFromChain error - ", error);
         runner--;
     }
 }
@@ -707,7 +669,7 @@ async function retryMissingBlocks(start, missingBlocks) {
             for (let i = start; i <= missingBlocks.length && runner < config.bulkSize; i++) {
                 if (missingBlocks[i]) {
                     runner++;
-                    await handleBlockData(missingBlocks[i]);
+                    await fetchBlockFromChain(missingBlocks[i]);
                 }
 
                 nextStart = i;
