@@ -183,7 +183,7 @@ var quickSync = async function (config, nextBlock) {
                 { sort: { number: -1 } }
             );
 
-            nextBlock = highestBlock?.number + 1 || startBlock;
+            nextBlock = highestBlock?.number + 1 || config.startBlock;
         }
         const endBlock = await web3.eth.getBlockNumber();
 
