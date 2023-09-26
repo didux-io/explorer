@@ -27,7 +27,7 @@ angular.module('BlocksApp').controller('TxController', function($stateParams, $r
         return;
       }
       $scope.tx = resp.data;
-      $scope.tx.checkSumFrom = web3.utils.toChecksumAddress($scope.tx.from);
+      $scope.tx.checkSumFrom = $scope.tx.from === "Genesis" ? "Genesis" : web3.utils.toChecksumAddress($scope.tx.from);
       $scope.tx.checkSumTo = web3.utils.toChecksumAddress($scope.tx.to);
       if (resp.data.timestamp)
         $scope.tx.datetime = new Date(resp.data.timestamp*1000); 
