@@ -14,13 +14,13 @@ const ERC20ABI = require("human-standard-token-abi");
 
 const fetch = require("node-fetch");
 const abiDecoder = require("abi-decoder");
-const asyncL = require('async');
+const asyncL = require("async");
 
 const mongoose = require("mongoose");
 const etherUnits = require("../lib/etherUnits.js");
 const { Market } = require("../db.js");
 const local = require("../config.json");
-const Web3Provider = require("./web3Provider")
+const Web3Provider = require("./web3Provider");
 
 const Block = mongoose.model("Block");
 const Transaction = mongoose.model("Transaction");
@@ -67,10 +67,9 @@ if (!config.nodeAddr && config.nodes) {
 // Sets address for RPC WEB3 to connect to, usually your node IP address defaults ot localhost
 // let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
 
-
 // Example usage:
-const connectionUrls = [ "http://37.59.131.19:22000"];
-const httpWeb3 = new Web3(new Web3Provider(connectionUrls))
+const connectionUrls = ["http://37.59.131.19:22000"];
+const httpWeb3 = new Web3(new Web3Provider(connectionUrls));
 const web3 = new Web3(config.nodeAddr);
 if (web3.eth.net.isListening()) {
     console.log("sync - Web3 connection established");
@@ -196,6 +195,10 @@ var quickSync = async function (config, nextBlock) {
             return;
         }
 
+        if (nextBlock === 0) {
+            await updateBalancesFromGenesisBlock();
+        }
+
         // console.log(`Start ${config.bulkSize - runner} tasks`);
         for (let i = runner; i < config.bulkSize; i++) {
             runner++;
@@ -213,6 +216,88 @@ var quickSync = async function (config, nextBlock) {
         await quickSync(config, nextBlock);
     }
 };
+
+async function updateBalancesFromGenesisBlock() {
+    try {
+        console.log("Updating balances from genesis block.")
+        const accountsToUpdate = [
+            {
+                address: "0x24ee7b148b55df273bc4a9ae95d4fe4a38523d8d",
+                balance: 20004,
+            },
+            {
+                address: "0x2b3ef64677cfd74bbc74fab4edecb6ab43a085b6",
+                balance: 20004,
+            },
+            {
+                address: "0x3a478b61a49b7d7eee100cd5ff87e251b9fb19da",
+                balance: 20004,
+            },
+            {
+                address: "0x3eaaab80e68df347d4f67dfc2b6e5374dc82cde6",
+                balance: 20004,
+            },
+            {
+                address: "0x41e7a72b843ffa7813ff979dc8bc21429e461ad9",
+                balance: 20004,
+            },
+            {
+                address: "0x4a2d36406509336db56818f356c4f631388e7dd4",
+                balance: 20004,
+            },
+            {
+                address: "0x501ec2563de403a87acfe6631d50d90aabdd1a03",
+                balance: 20004,
+            },
+            {
+                address: "0x52161ab9ebeb3468253b4e2a775e730a42f953eb",
+                balance: 20004,
+            },
+            {
+                address: "0x71a0662967f6fffee0dcd48212442b964c1a72b3",
+                balance: 20004,
+            },
+            {
+                address: "0x87142ee9ad7c1b675005e39b4fcaac7452df49fc",
+                balance: 20004,
+            },
+            {
+                address: "0xbc75c3b64e7621469509df5cdd61f4f419ec903f",
+                balance: 80000000,
+            },
+            {
+                address: "0xc0ad1d8829e0e3750923711820ab5db8e9028eba",
+                balance: 20004,
+            },
+            {
+                address: "0xf9216c8e2d584194aedba520b471145df460bc90",
+                balance: 20004,
+            },
+        ];
+
+        for(const account of accountsToUpdate) {
+            await Account.collection.updateOne(
+                { address: account.address },
+                {
+                    $inc: {
+                        balance: account.balance,
+                    },
+                    $set: {
+                        address: account.address,
+                        // Block 0 is genesis block.
+                        blockNumber: 0
+                    },
+                },
+                { upsert: true }
+            );
+        }
+        console.log("Finished updating balances from genesis block.")
+    } catch (error) {
+        console.log(
+            "Error occurred while updating balances from genesis block", error
+        );
+    }
+}
 
 async function calculateTotalTransactions() {
     try {
@@ -249,9 +334,11 @@ async function parseBlockToDb(blockData) {
 
         if (blockData?.transactions?.length > 0) {
             for (const txData of blockData.transactions) {
-            // console.log(`Before Receipt:`);
-            // console.log(`txData ahash:`, txData.hash);
-                const receipt = await httpWeb3.eth.getTransactionReceipt(txData.hash);
+                // console.log(`Before Receipt:`);
+                // console.log(`txData ahash:`, txData.hash);
+                const receipt = await httpWeb3.eth.getTransactionReceipt(
+                    txData.hash
+                );
                 // console.log(`Receipt:`, receipt);
                 const tx = await normalizeTX(txData, receipt, blockData);
                 const accountData = {};
@@ -264,8 +351,7 @@ async function parseBlockToDb(blockData) {
                             receipt
                         );
                     } else {
-    
-                        // @TODO: Internal TX handling 
+                        // @TODO: Internal TX handling
                         // internalTxData = await handleInternalTx(
                         //     blockData,
                         //     txData,
@@ -273,7 +359,7 @@ async function parseBlockToDb(blockData) {
                         // );
                     }
                 }
-    
+
                 if (tx.creates) {
                     accountData[tx.creates] = {
                         address: tx.creates,
@@ -282,26 +368,28 @@ async function parseBlockToDb(blockData) {
                         type: 1, // contract
                     };
                 }
-    
+
                 accountData[tx.from] = {
                     address: tx.from,
                     blockNumber: tx.blockNumber,
                     balance: Number(0 - tx.value),
                 };
-    
+
                 if (tx.to) {
                     accountData[tx.to] = {
                         address: tx.to,
                         blockNumber: tx.blockNumber,
                         balance: Number(0 + tx.value),
                     };
-    
+
                     // If you send to yourself nothing changes.
                     if (tx.to === tx.from) {
-                        accountData[tx.to].balance = accountData[tx.from].balance = 0;
+                        accountData[tx.to].balance = accountData[
+                            tx.from
+                        ].balance = 0;
                     }
                 }
-    
+
                 accountDataPerTransaction.push(accountData);
                 transactions.push(tx);
             }
@@ -345,7 +433,7 @@ async function parseBlockToDb(blockData) {
                     );
                 }
 
-                // @TODO: Internal TX handling 
+                // @TODO: Internal TX handling
                 // if (
                 //     internalTxData?.type === "transfer" ||
                 //     internalTxData?.type === "transferfrom"
@@ -541,9 +629,9 @@ async function fetchBlockFromChain(block) {
         if (!block && block !== 0) {
             console.log(
                 "Thats weird, you can't call fetchBlockFromChain without a block number, or blockHeader.hash, you pancake."
-                );
-                runner--;
-            } else {
+            );
+            runner--;
+        } else {
             // console.log(web3.currentProvider);
             web3.eth.getBlock(block, true, async (error, blockData) => {
                 if (error) {
@@ -653,9 +741,11 @@ async function retryMissingBlocks(start, missingBlocks) {
             start = 0;
             const count = await Block.collection.countDocuments();
             if (!count) {
-                return console.log("No blocks in DB, skipping retryMissingBlocks.");
+                return console.log(
+                    "No blocks in DB, skipping retryMissingBlocks."
+                );
             }
-    
+
             missingBlocks = await calculateMissingBlocks(count);
         }
 
@@ -664,9 +754,13 @@ async function retryMissingBlocks(start, missingBlocks) {
         } else {
             // console.log("Missing blocks found, retrieving them, Standby.");
             // console.log(`Start ${config.bulkSize - runner} tasks`);
-            
+
             let nextStart = 0;
-            for (let i = start; i <= missingBlocks.length && runner < config.bulkSize; i++) {
+            for (
+                let i = start;
+                i <= missingBlocks.length && runner < config.bulkSize;
+                i++
+            ) {
                 if (missingBlocks[i]) {
                     runner++;
                     await fetchBlockFromChain(missingBlocks[i]);
