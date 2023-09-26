@@ -4,7 +4,7 @@
     "quiet":        true,
     "syncAll":      true,
     "patchBlocks":  100,
-    "bulkSize":     500,
+    "bulkSize":     100,
     "settings": {
         "symbol": "XD",
         "name": "Didux.io",

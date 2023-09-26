@@ -14,6 +14,7 @@ const ERC20ABI = require("human-standard-token-abi");
 
 const fetch = require("node-fetch");
 const abiDecoder = require("abi-decoder");
+const asyncL = require('async');
 
 const mongoose = require("mongoose");
 const etherUnits = require("../lib/etherUnits.js");
@@ -68,7 +69,7 @@ if (!config.nodeAddr && config.nodes) {
 
 
 // Example usage:
-const connectionUrls = [ "http://212.32.245.83:22000", "http://212.32.245.91:22000", "http://51.89.103.235:22000", "http://37.59.131.19:22000"];
+const connectionUrls = [ "http://37.59.131.19:22000"];
 const httpWeb3 = new Web3(new Web3Provider(connectionUrls))
 const web3 = new Web3(config.nodeAddr);
 if (web3.eth.net.isListening()) {
@@ -220,7 +221,7 @@ var quickSync = async function (config, nextBlock) {
                 { sort: { number: -1 } }
             );
 
-            nextBlock = highestBlock?.number + 1 || 0;
+            nextBlock = highestBlock?.number + 1 || 1000000;
         }
         const endBlock = await web3.eth.getBlockNumber();
 
@@ -573,9 +574,9 @@ async function handleBlockData(block) {
         if (!block && block !== 0) {
             console.log(
                 "Thats weird, you can't call handleBlockData without a block number, or blockHeader.hash, you pancake."
-            );
-            runner--;
-        } else {
+                );
+                runner--;
+            } else {
             // console.log(web3.currentProvider);
             web3.eth.getBlock(block, true, async (error, blockData) => {
                 if (error) {
@@ -587,7 +588,6 @@ async function handleBlockData(block) {
                         `Warning: null block data received from the block with hash/number: ${block}`
                     );
                 } else {
-                    console.log("got block", blockData.number)
                     try {
                         // console.log(`blockData.transactions:`, blockData.transactions.length);
                         if (blockData?.transactions?.length > 0) {
@@ -654,7 +654,7 @@ if (config.syncAll === true) {
     setTimeout(async () => {
         console.log("Starting Full Sync");
 
-        // await retryMissingBlocks();
+        await retryMissingBlocks();
         await quickSync(config);
     }, 7500);
 }
@@ -685,51 +685,40 @@ async function updateMinerMinedBlocks() {
     }
 }
 
-async function retryMissingBlocks() {
+async function retryMissingBlocks(start, missingBlocks) {
     try {
-        const count = await Block.collection.countDocuments();
+        if (!missingBlocks) {
+            start = 0;
+            const count = await Block.collection.countDocuments();
+            if (!count) {
+                return console.log("No blocks in DB, skipping retryMissingBlocks.");
+            }
+    
+            missingBlocks = await calculateMissingBlocks(count);
+        }
 
-        if (!count) {
-            console.log("No blocks in DB, skipping retryMissingBlocks.");
+        if (missingBlocks.length === start) {
+            console.log("No missing blocks found, perfect.");
         } else {
-            // console.log(
-            //     "Blocks found in DB, retrying missing blocks if they exist."
-            // );
-
-            const missingBlocks = await calculateMissingBlocks(count);
-            if (missingBlocks.length === 0) {
-                console.log("No missing blocks found, perfect.");
-            } else {
-                // console.log("Missing blocks found, retrieving them, Standby.");
-                // console.log(`Start ${config.bulkSize - runner} tasks`);
-                for (let i = 0; i < missingBlocks.length; i++) {
-                    if (runner < config.bulkSize && missingBlocks[i]) {
-                        runner++;
-                        console.log(`New Runner....`)
-                        await handleBlockData(missingBlocks[i]);
-                    } else {
-                        // setTimeout(async () => {
-                            // console.log(`Runner is limited, wait....`)
-                            i--
-                            // console.log(
-                            //     `Recovered ${config.bulkSize} blocks, checking if theres more to recover`
-                            // );
-                            // await retryMissingBlocks();
-                        // }, 2000);
-                    }
+            // console.log("Missing blocks found, retrieving them, Standby.");
+            // console.log(`Start ${config.bulkSize - runner} tasks`);
+            
+            let nextStart = 0;
+            for (let i = start; i <= missingBlocks.length && runner < config.bulkSize; i++) {
+                if (missingBlocks[i]) {
+                    runner++;
+                    await handleBlockData(missingBlocks[i]);
                 }
 
-                // if (missingBlocks.length > config.bulkSize) {
-                //     setTimeout(async () => {
-                //         // console.log(
-                //         //     `Recovered ${config.bulkSize} blocks, checking if theres more to recover`
-                //         // );
-                //         await retryMissingBlocks();
-                //     }, 2000);
-                // } else {
-                    console.log("Finished recovering blocks")
-                // }
+                nextStart = i;
             }
+
+            setTimeout(async () => {
+                // console.log(
+                //     `Recovered ${config.bulkSize} blocks, checking if theres more to recover`
+                // );
+                await retryMissingBlocks(nextStart, missingBlocks);
+            }, 2000);
         }
     } catch (error) {
         console.log("retryMissingBlocks Error", error);
