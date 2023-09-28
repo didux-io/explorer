@@ -150,7 +150,7 @@ let getBlockReward = function (b) {
 /**
   //Just listen for latest blocks and sync from the start of the app.
 **/
-const listenBlocks = function () {
+const listenBlocks = function (fromBlock) {
     const newBlocks = web3.eth.subscribe("newBlockHeaders", (error, result) => {
         if (!error) {
             return;
@@ -158,9 +158,16 @@ const listenBlocks = function () {
         console.error(error);
     });
     newBlocks.on("data", async (blockHeader) => {
-        await fetchBlockFromChain(blockHeader.hash);
-        await updateMinerMinedBlocks();
-        await calculateTotalTransactions();
+        if(fromBlock && blockHeader.number && fromBlock + 1 < blockHeader.number) {
+            const startBlock = fromBlock + 1;
+            fromBlock = null;
+            console.log(`We are missing blocks from ${startBlock} till ${blockHeader.number}`)
+            for (let i = startBlock; i <= blockHeader.number; i++) {
+                await fetchBlockFromChain(i, true);
+            }
+        } else {
+            await fetchBlockFromChain(blockHeader.hash, true);
+        }
     });
     newBlocks.on("error", console.error);
 };
@@ -180,22 +187,25 @@ var quickSync = async function (config, nextBlock) {
 
             nextBlock = highestBlock?.number + 1 || config.startBlock;
         }
+        
         const endBlock = await web3.eth.getBlockNumber();
 
         if (nextBlock >= endBlock) {
-            await retryMissingBlocks();
-            await updateMinerMinedBlocks();
+            // Database is uptodate untill block endBlock.
             await calculateTotalTransactions();
-
-            listenBlocks(config);
+            await updateMinerMinedBlocks();
+            // Is endBlock equal to nodes latest block?
+            listenBlocks(endBlock);    
             return;
         }
 
         // console.log(`Start ${config.bulkSize - runner} tasks`);
         for (let i = runner; i < config.bulkSize; i++) {
-            runner++;
-            await fetchBlockFromChain(nextBlock);
-            nextBlock++;
+            if (nextBlock <= endBlock) {
+                runner++;
+                await fetchBlockFromChain(nextBlock);
+                nextBlock++;
+            }
         }
 
         setTimeout(async () => {
@@ -369,7 +379,7 @@ async function calculateTotalTransactions() {
     }
 }
 
-async function parseBlockToDb(blockData) {
+async function parseBlockToDb(blockData, updateCounters) {
     try {
         // So we obviously have transaction(s).
         blockData.miner = blockData.miner?.toLowerCase();
@@ -500,6 +510,41 @@ async function parseBlockToDb(blockData) {
                 //         }
                 //     );
                 // }
+                if (updateCounters) {
+                    await MinedBlocksCount.findOneAndUpdate(
+                        {
+                            // Filter
+                            type: "global",
+                        },
+                        {
+                            $inc: {
+                                amount: blockData?.transactions?.length,
+                            }
+                        },
+                        {
+                            // Options
+                            upsert: true,
+                            new: true,
+                            session
+                        }
+                    );
+
+                    await MinedBlocksCount.findOneAndUpdate(
+                        {
+                            address: blockData.miner,
+                        },
+                        {
+                            $inc: {
+                                amount: 1,
+                            },
+                            type: "address",
+                        },
+                        {
+                            upsert: true,
+                            session
+                        }
+                    );
+                }
                 if (blockData?.transactions?.length > 0) {
                     await Transaction.collection.insertMany(transactions, {
                         session,
@@ -670,7 +715,7 @@ async function handleContractDeployment(blockData, txData, receipt) {
     }
 }
 
-async function fetchBlockFromChain(block) {
+async function fetchBlockFromChain(block, updateCounters) {
     try {
         if (!block && block !== 0) {
             console.log(
@@ -690,7 +735,7 @@ async function fetchBlockFromChain(block) {
                     );
                 } else {
                     try {
-                        await parseBlockToDb(blockData);
+                        await parseBlockToDb(blockData, updateCounters);
                     } catch (error) {
                         console.error("DB Block & TX Session error", error);
                     }
