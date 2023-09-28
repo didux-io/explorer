@@ -761,11 +761,9 @@ if (config.syncAll === true) {
 
 async function updateMinerMinedBlocks() {
     const miners = await Block.collection.distinct("miner");
-    console.log("miners", miners);
     for (const miner of miners) {
         const result = await Block.collection.countDocuments({ miner });
         if (miner != "0x0000000000000000000000000000000000000000") {
-            console.log(`Miner ${miner} : ${result}`);
             await MinedBlocksCount.findOneAndUpdate(
                 {
                     // Filter
