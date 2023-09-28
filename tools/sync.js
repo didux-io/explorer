@@ -75,6 +75,9 @@ if (web3.eth.net.isListening()) {
 } else throw "sync - No connection, please specify web3host in conf.json";
 
 const normalizeTX = async (txData, receipt, blockData) => {
+    if (!receipt) {
+        console.log("Receipt is gone block:", blockData.number)
+    }
     const tx = {
         blockHash: txData.blockHash,
         blockNumber: txData.blockNumber,

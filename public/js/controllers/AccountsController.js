@@ -55,7 +55,7 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
         {
           render:
             function(data, type, row) {
-              return '<a href="/addr/' + data +'">' + web3.utils.toChecksumAddress(data) + '</a>'
+                return '<a href="/addr/' + data +'">' + web3.utils.toChecksumAddress(data) + '</a>'
             },
           targets: [1]
         },
@@ -103,20 +103,19 @@ function getTotalXsmCreated(totalBlocks) {
   if (totalBlocks >= 3200000000) totalBlocks = 3200000000;
 
   const increments = [{ blocks: 1, reward: 4 },
-    { blocks: 20000001, reward: 2 },
-    { blocks: 40000001, reward: 1.75 },
-    { blocks: 60000001, reward: 1.5 },
-    { blocks: 80000001, reward: 1.25 },
-    { blocks: 100000001, reward: 1.0 },
-    { blocks: 120000001, reward: 0.8 },
-    { blocks: 140000001, reward: 0.6 },
-    { blocks: 160000001, reward: 0.4 },
-    { blocks: 180000001, reward: 0.2 },
-    { blocks: 200000001, reward: 0.1 },
-    { blocks: 400000001, reward: 0.05 },
-    { blocks: 800000001, reward: 0.025 },
-    { blocks: 1600000001, reward: 0.0125 }];
-
+    { blocks: 20000000, reward: 2 },
+    { blocks: 40000000, reward: 1.75 },
+    { blocks: 60000000, reward: 1.5 },
+    { blocks: 80000000, reward: 1.25 },
+    { blocks: 100000000, reward: 1.0 },
+    { blocks: 120000000, reward: 0.8 },
+    { blocks: 140000000, reward: 0.6 },
+    { blocks: 160000000, reward: 0.4 },
+    { blocks: 180000000, reward: 0.2 },
+    { blocks: 200000000, reward: 0.1 },
+    { blocks: 400000000, reward: 0.05 },
+    { blocks: 800000000, reward: 0.025 }];
+    
   const totalXsmCreated = increments.reverse().reduce((previous, increment) => {
     let reward = 0;
     let { blocks } = previous;
