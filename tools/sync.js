@@ -395,9 +395,18 @@ async function parseBlockToDb(blockData, updateCounters) {
             for (const txData of blockData.transactions) {
                 // console.log(`Before Receipt:`);
                 // console.log(`txData ahash:`, txData.hash);
-                const receipt = await httpWeb3.eth.getTransactionReceipt(
-                    txData.hash
-                );
+                let receipt;
+                // if !updatecounters use httpWeb3 for historic data load balancing
+                if (!updateCounters) {
+                    receipt = await httpWeb3.eth.getTransactionReceipt(
+                        txData.hash
+                    );
+                } else if (updateCounters) {
+                    // Else use the web3 connection to get receipt.
+                    receipt = await web3.eth.getTransactionReceipt(
+                        txData.hash
+                    );
+                }
                 // console.log(`Receipt:`, receipt);
                 const tx = await normalizeTX(txData, receipt, blockData);
                 const accountData = {};
