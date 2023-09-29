@@ -13,26 +13,28 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
         // get totalSupply only once.
         data.totalSupply = $scope.totalSupply || -1;
         data.recordsTotal = $scope.totalAccounts || 0;
-        $http.post('/richlist', data).then(function(resp) {
-          // set the totalSupply
-          if (resp.data.totalSupply) {
-            $scope.totalSupply = resp.data.totalSupply;
-          }
-          // set the number of total accounts
-          $scope.totalAccounts = resp.data.recordsTotal;
-
-          // fixup data to show percentages
-          var newdata = resp.data.data.map(function(item) {
-            var num = item[0];
-            var addr = item[1];
-            var type = item[2];
-            var balance = item[3];
-            var lastmod = item[4];
-            return [num, addr, type, balance, (balance / $scope.totalSupply) * 100, lastmod];
+        let totalSupply;
+        $http.get('/stats').then(function(resp) {
+          totalSupply = resp.data.current_supply
+          $http.post('/richlist', data).then(async function(resp) {
+            $scope.totalSupply = totalSupply;
+            
+            // set the number of total accounts
+            $scope.totalAccounts = resp.data.recordsTotal;
+            // fixup data to show percentages
+            var newdata = resp.data.data.map(function(item) {
+              var num = item[0];
+              var addr = item[1];
+              var type = item[2];
+              var balance = item[3];
+              var lastmod = item[4];
+              return [num, addr, type, balance, (balance / $scope.totalSupply) * 100, lastmod];
+            });
+            resp.data.data = newdata;
+            callback(resp.data);
           });
-          resp.data.data = newdata;
-          callback(resp.data);
-        });
+  
+        })
       },
       lengthMenu: [
         [20, 50, 100, 150, 200, 500],
@@ -53,7 +55,7 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
         {
           render:
             function(data, type, row) {
-              return '<a href="/addr/' + data +'">' + web3.utils.toChecksumAddress(data) + '</a>'
+                return '<a href="/addr/' + data +'">' + web3.utils.toChecksumAddress(data) + '</a>'
             },
           targets: [1]
         },
@@ -95,3 +97,42 @@ angular.module('BlocksApp').controller('AccountsController', function($statePara
 
   getAccounts();
 });
+
+// https://github.com/Smilo-platform/Wiki/wiki/Masternode-block-reward
+function getTotalXsmCreated(totalBlocks) {
+  if (totalBlocks >= 3200000000) totalBlocks = 3200000000;
+
+  const increments = [{ blocks: 1, reward: 4 },
+    { blocks: 20000000, reward: 2 },
+    { blocks: 40000000, reward: 1.75 },
+    { blocks: 60000000, reward: 1.5 },
+    { blocks: 80000000, reward: 1.25 },
+    { blocks: 100000000, reward: 1.0 },
+    { blocks: 120000000, reward: 0.8 },
+    { blocks: 140000000, reward: 0.6 },
+    { blocks: 160000000, reward: 0.4 },
+    { blocks: 180000000, reward: 0.2 },
+    { blocks: 200000000, reward: 0.1 },
+    { blocks: 400000000, reward: 0.05 },
+    { blocks: 800000000, reward: 0.025 }];
+    
+  const totalXsmCreated = increments.reverse().reduce((previous, increment) => {
+    let reward = 0;
+    let { blocks } = previous;
+    if (previous.blocks >= increment.blocks) {
+      const blocksInSection = previous.blocks - (increment.blocks - 1);
+      reward = blocksInSection * increment.reward;
+      blocks = increment.blocks - 1;
+    }
+
+    return {
+      reward: previous.reward + reward,
+      blocks,
+    };
+  }, { reward: 0, blocks: totalBlocks });
+
+  // Increment calculation with pre-mined Foundation tokens
+  totalXsmCreated.reward += 80000000;
+
+  return totalXsmCreated.reward;
+}

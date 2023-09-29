@@ -230,10 +230,14 @@ angular.module('BlocksApp').controller('AddressController', function ($statePara
                 {
                     "render": function (data, type, row) {
                         let checkSumCheckedAddress = data;
-                        if (data !== null) {
+                        if (data !== null && data !== "Genesis") {
                             checkSumCheckedAddress = web3.utils.toChecksumAddress(data);
                         }
-                        return '<a href="/addr/' + data + '">' + checkSumCheckedAddress + '</a>'
+                        if (data === "Genesis") {
+                            return '<span>' + checkSumCheckedAddress + '</span>'
+                        } else {
+                            return '<a href="/addr/' + data + '">' + checkSumCheckedAddress + '</a>'
+                        }
                     }, "targets": [2, 3]
                 },
                 {

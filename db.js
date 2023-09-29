@@ -183,4 +183,10 @@ module.exports.TokenTransfer = mongoose.model('TokenTransfer');
 module.exports.MinedBlocksCount = mongoose.model('MinedBlocksCount');
 
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/explorerDB');
+try {
+  mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/explorerDB', {
+    replicaSet: "rs0"
+  });
+} catch (error) {
+  console.error(error)  
+}

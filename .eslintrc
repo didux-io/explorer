@@ -1,0 +1,84 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint",
+        "no-loops"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+        "no-console": 0,
+        "no-loops/no-loops": 0,
+        "quotes": "off",
+        "@typescript-eslint/quotes": 1,
+        "indent": [
+            "error",
+            4,
+            {
+                "ignoredNodes": [
+                    "FunctionExpression > .params[decorators.length > 0]",
+                    "FunctionExpression > .params > :matches(Decorator, :not(:first-child))",
+                    "ClassBody.body > PropertyDefinition[decorators.length > 0] > .key"
+                ],
+                "SwitchCase": 1 // Apparently we need a special identation rule for switch cases...
+            }
+        ],
+        "no-mixed-spaces-and-tabs": "off",
+        "selector-type-no-unknown": "off",
+        "object-curly-spacing": "off",
+        "no-multi-spaces": "error",
+        "@typescript-eslint/object-curly-spacing": [2, "always", {
+            "objectsInObjects": false,
+            "arraysInObjects": true
+        }],
+        "@typescript-eslint/comma-spacing": ["error"],
+        "@typescript-eslint/type-annotation-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "space-before-blocks": "off",
+        "@typescript-eslint/space-before-blocks": ["error"],
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "brace-style": "off",
+        "@typescript-eslint/brace-style": ["error", "1tbs"],
+        "comma-dangle": "off",
+        "@typescript-eslint/comma-dangle": ["error"],
+        "lines-between-class-members": "off",
+        "@typescript-eslint/no-duplicate-enum-values": "warn",
+        "no-empty-function": "off",
+        "@typescript-eslint/no-empty-function": ["error"],
+        "@typescript-eslint/no-empty-interface": [
+            "error",
+            {
+                "allowSingleExtends": false
+            }
+        ],
+        "@typescript-eslint/no-extra-non-null-assertion": "error",
+        "@typescript-eslint/no-inferrable-types": "error",
+        "no-invalid-this": "off",
+        "@typescript-eslint/no-invalid-this": "error",
+        "@typescript-eslint/no-misused-new": "error",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "no-useless-constructor": "off",
+        "@typescript-eslint/no-useless-constructor": "error",
+        "@typescript-eslint/no-useless-empty-export": "error",
+        "@typescript-eslint/prefer-for-of": "warn"
+    },
+    "overrides": [
+        {
+            // enable the rule specifically for TypeScript files
+            "files": ["*.ts", "*.mts", "*.cts", "*.tsx"],
+            "rules": {
+                "@typescript-eslint/explicit-function-return-type": ["error"]
+            }
+        }
+    ]
+}

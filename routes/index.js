@@ -223,7 +223,7 @@ var getMinedBlocks = async function (req, res) {
     .exec('find', (err, docs) => {
       if (docs) data.data = filters.filterMinedBlock(docs, addr);
       else data.data = [];
-
+      console.log("data.data", data)
       console.log('getMinedBlocks end lean');
       res.write(JSON.stringify(data));
       res.end();

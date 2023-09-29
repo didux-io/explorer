@@ -29,7 +29,7 @@
         <tr >
           <td width="25%">From:</td>
           <td>
-            <span ng-hide="tx.tokenFrom"><a href="/addr/{{tx.from}}">{{tx.checkSumFrom}}</a></span>
+            <span ng-hide="tx.tokenFrom"><a ng-if="tx.checkSumFrom !== 'Genesis'" href="/addr/{{tx.from}}">{{tx.checkSumFrom}}</a><span ng-if="tx.checkSumFrom === 'Genesis'">{{tx.checkSumFrom}}</span></span>
             <span ng-show="tx.tokenFrom"><a href="/addr/{{tx.tokenFrom}}">{{tx.tokenFrom}}</a></span>
           </td>
         </tr>
