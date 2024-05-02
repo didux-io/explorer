@@ -67,7 +67,7 @@ if (!config.nodeAddr && config.nodes) {
 // let web3 = new Web3(new Web3.providers.WebsocketProvider(`${config.nodeAddr}`));
 
 // Example usage:
-const connectionUrls = ["http://37.59.131.19:22000"];
+const connectionUrls = ["http://87.98.221.129:22000"];
 const httpWeb3 = new Web3(new Web3Provider(connectionUrls));
 const web3 = new Web3(config.nodeAddr);
 if (web3.eth.net.isListening()) {
